@@ -35,25 +35,26 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .prizes { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .prize-badge { font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
 .prize-1 { background: #FAEEDA; color: #633806; }
-.prize-2 { background: #F1EFE8; color: #444441; }
+.prize-2 { background: var(--gray-light); color: #444441; }
 .prize-3 { background: var(--coral-light); color: var(--coral); }
-.sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+.sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 10px; flex-wrap: wrap; }
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
 .sync-dot.ok { background: #639922; }
 .sync-dot.loading { background: #BA7517; animation: pulse 1s infinite; }
 .sync-dot.err { background: #E24B4A; }
+.sync-sep { color: var(--border); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tab { font-size: 14px; padding: 8px 16px; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; white-space: nowrap; }
 .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--text); }
 .mode-toggle { display: flex; gap: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 16px; width: fit-content; }
 .mode-btn { font-size: 13px; padding: 7px 16px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-family: inherit; }
 .mode-btn.active { background: var(--text); color: var(--bg); font-weight: 500; }
 .leaderboard { display: flex; flex-direction: column; gap: 8px; }
-.lb-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); transition: opacity .2s; }
-.lb-row.first { border: 2px solid #EF9F27; }
+.lb-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.lb-row.first  { border: 2px solid #EF9F27; }
 .lb-row.second { border: 2px solid #aaaaaa; }
-.lb-row.third { border: 2px solid #cd7f32; }
+.lb-row.third  { border: 2px solid #cd7f32; }
 .lb-row.eliminated { opacity: .5; }
 .lb-pos { font-size: 16px; font-weight: 600; width: 32px; text-align: center; flex-shrink: 0; color: var(--text-muted); }
 .lb-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
@@ -63,15 +64,17 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .pick { font-size: 11px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
 .s-group { background: var(--green-light); color: var(--green-dark); }
 .s-elim  { background: var(--gray-light); color: var(--gray); text-decoration: line-through; opacity: .65; }
+.s-r32   { background: #E6F1FB; color: #185FA5; }
 .s-r16   { background: var(--blue-light); color: var(--blue); }
 .s-qf    { background: var(--purple-light); color: var(--purple); }
 .s-sf    { background: var(--amber-light); color: var(--amber); }
 .s-final { background: var(--pink-light); color: var(--pink); }
 .s-won   { background: var(--green-light); color: var(--green); font-weight: 600; }
-.lb-score { text-align: right; flex-shrink: 0; min-width: 60px; }
+.lb-score { text-align: right; flex-shrink: 0; min-width: 64px; }
 .score-n { font-size: 24px; font-weight: 600; }
 .score-sub { font-size: 11px; color: var(--text-muted); }
 .last-standing-info { background: var(--amber-light); border: 1px solid #EF9F27; border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--amber); margin-bottom: 16px; line-height: 1.6; }
+.auto-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 9px; border-radius: 10px; background: var(--green-light); color: var(--green-dark); font-weight: 500; }
 .section-title { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 18px 0 6px; }
 .team-list { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .team-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
@@ -80,16 +83,19 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .t-name { flex: 1; font-size: 13px; }
 .t-owner { font-size: 11px; }
 .t-select { font-size: 12px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); cursor: pointer; font-family: inherit; }
+.t-auto { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: var(--green-light); color: var(--green-dark); white-space: nowrap; }
 .save-area { margin-top: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.btn-save { font-size: 14px; padding: 9px 22px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--text); color: var(--bg); cursor: pointer; font-family: inherit; font-weight: 500; }
-.btn-save:hover { opacity: .85; }
-.btn-save:disabled { opacity: .45; cursor: default; }
+.btn { font-size: 14px; padding: 9px 22px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--text); color: var(--bg); cursor: pointer; font-family: inherit; font-weight: 500; }
+.btn:hover { opacity: .85; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn-secondary { background: var(--bg-card); color: var(--text); }
 .save-msg { font-size: 13px; color: var(--text-muted); }
-.setup-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.setup-box h2 { font-size: 16px; font-weight: 500; margin-bottom: 10px; }
-.setup-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
-.setup-box input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg); color: var(--text); font-family: inherit; margin-bottom: 10px; }
-.setup-box a { color: var(--blue); }
+.info-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.info-box h2 { font-size: 16px; font-weight: 500; margin-bottom: 10px; }
+.info-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
+.info-box input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg); color: var(--text); font-family: inherit; margin-bottom: 10px; }
+.info-box a { color: var(--blue); }
+.info-box code { font-size: 11px; background: var(--bg); padding: 2px 6px; border-radius: 4px; }
 .scoring-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 16px; }
 .scoring-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
 .scoring-card table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -98,7 +104,6 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .scoring-card td:last-child { text-align: right; font-weight: 500; }
 .note { font-size: 12px; color: var(--text-muted); margin-top: 12px; line-height: 1.6; }
 .divider { height: 1px; background: var(--border); margin: 20px 0; }
-.out-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; background: var(--gray-light); color: var(--gray); }
 @media(max-width:520px) {
   .lb-row { flex-wrap: wrap; }
   .lb-score { width: 100%; text-align: left; display: flex; align-items: baseline; gap: 8px; padding-top: 4px; }
@@ -113,13 +118,15 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
     <h1>⚽ World Cup 2026 — Family Pool</h1>
     <p>June 11 – July 19 &nbsp;·&nbsp; 10 players &nbsp;·&nbsp; 49 picks &nbsp;·&nbsp; $2/team entry</p>
     <div class="prizes">
-      <span class="prize-badge prize-1">🥇 1st place — $50</span>
-      <span class="prize-badge prize-2">🥈 2nd place — $30</span>
-      <span class="prize-badge prize-3">🥉 3rd place — $16</span>
+      <span class="prize-badge prize-1">🥇 1st — $50</span>
+      <span class="prize-badge prize-2">🥈 2nd — $30</span>
+      <span class="prize-badge prize-3">🥉 3rd — $16</span>
     </div>
     <div class="sync-bar">
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncMsg">Connecting…</span>
+      <span class="sync-sep">·</span>
+      <span id="autoMsg">Scores: checking…</span>
     </div>
   </header>
 
@@ -156,7 +163,7 @@ const DRAFT = [
   {person:"Bob",      teams:["Qatar","Senegal","Ecuador","Spain","Croatia"]},
   {person:"Gretchen", teams:["Iraq","Ghana","Mexico","Scotland","Belgium"]},
   {person:"Simon",    teams:["Japan","South Africa","Argentina","Germany","Uruguay"]},
-  {person:"Juliet",   teams:["Iran","Democratic Republic of Congo","Canada","Switzerland","Paraguay"]},
+  {person:"Juliet",   teams:["Iran","DR Congo","Canada","Switzerland","Paraguay"]},
   {person:"River",    teams:["Jordan","Egypt","Brazil","Turkey","Bosnia and Herzegovina"]},
   {person:"Scott",    teams:["Australia","Ivory Coast","United States","Netherlands","Czech Republic"]},
   {person:"Alden",    teams:["New Zealand","Morocco","Curacao","Sweden","England"]},
@@ -172,57 +179,230 @@ const FLAGS = {
   "Qatar":"🇶🇦","Senegal":"🇸🇳","Ecuador":"🇪🇨","Spain":"🇪🇸","Croatia":"🇭🇷",
   "Iraq":"🇮🇶","Ghana":"🇬🇭","Mexico":"🇲🇽","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Belgium":"🇧🇪",
   "Japan":"🇯🇵","South Africa":"🇿🇦","Argentina":"🇦🇷","Germany":"🇩🇪","Uruguay":"🇺🇾",
-  "Iran":"🇮🇷","Democratic Republic of Congo":"🇨🇩","Canada":"🇨🇦","Switzerland":"🇨🇭","Paraguay":"🇵🇾",
+  "Iran":"🇮🇷","DR Congo":"🇨🇩","Democratic Republic of Congo":"🇨🇩",
+  "Canada":"🇨🇦","Switzerland":"🇨🇭","Paraguay":"🇵🇾",
   "Jordan":"🇯🇴","Egypt":"🇪🇬","Brazil":"🇧🇷","Turkey":"🇹🇷","Bosnia and Herzegovina":"🇧🇦",
-  "Australia":"🇦🇺","Ivory Coast":"🇨🇮","United States":"🇺🇸","Netherlands":"🇳🇱","Czech Republic":"🇨🇿",
-  "New Zealand":"🇳🇿","Morocco":"🇲🇦","Curacao":"🇨🇼","Sweden":"🇸🇪","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-  "Saudi Arabia":"🇸🇦","Cape Verde":"🇨🇻","Panama":"🇵🇦","France":"🇫🇷","Austria":"🇦🇹",
+  "Bosnia":"🇧🇦","Australia":"🇦🇺","Ivory Coast":"🇨🇮","Côte d'Ivoire":"🇨🇮",
+  "United States":"🇺🇸","USA":"🇺🇸","Netherlands":"🇳🇱","Czech Republic":"🇨🇿","Czechia":"🇨🇿",
+  "New Zealand":"🇳🇿","Morocco":"🇲🇦","Curacao":"🇨🇼","Curaçao":"🇨🇼",
+  "Sweden":"🇸🇪","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Saudi Arabia":"🇸🇦","Cape Verde":"🇨🇻",
+  "Panama":"🇵🇦","France":"🇫🇷","Austria":"🇦🇹","South Korea":"🇰🇷","Korea Republic":"🇰🇷",
 };
 
 const CONFS = [
   {label:"AFC / OFC", teams:["South Korea","Uzbekistan","Qatar","Iraq","Japan","Iran","Jordan","Australia","New Zealand","Saudi Arabia"]},
-  {label:"CAF", teams:["Tunisia","Algeria","Senegal","Ghana","South Africa","Democratic Republic of Congo","Egypt","Ivory Coast","Morocco","Cape Verde"]},
+  {label:"CAF", teams:["Tunisia","Algeria","Senegal","Ghana","South Africa","DR Congo","Egypt","Ivory Coast","Morocco","Cape Verde"]},
   {label:"CONCACAF / CONMEBOL", teams:["Haiti","Colombia","Ecuador","Mexico","Argentina","Canada","Brazil","United States","Curacao","Panama"]},
   {label:"UEFA", teams:["Norway","Portugal","Spain","Scotland","Germany","Switzerland","Turkey","Netherlands","Sweden","France"]},
   {label:"CONMEBOL / UEFA (5th pick)", teams:["Croatia","Belgium","Uruguay","Paraguay","Bosnia and Herzegovina","Czech Republic","England","Austria"]},
 ];
 
 const STATUSES = [
-  {key:"group", label:"Group stage",  pts:0},
-  {key:"elim",  label:"Eliminated",   pts:0},
-  {key:"r16",   label:"Round of 16",  pts:2},
-  {key:"qf",    label:"Quarterfinal", pts:4},
-  {key:"sf",    label:"Semifinal",    pts:8},
-  {key:"final", label:"Final",        pts:12},
-  {key:"won",   label:"Champion 🏆",  pts:20},
+  {key:"group", label:"Group stage",   pts:0},
+  {key:"elim",  label:"Eliminated",    pts:0},
+  {key:"r32",   label:"Round of 32",   pts:1},
+  {key:"r16",   label:"Round of 16",   pts:2},
+  {key:"qf",    label:"Quarterfinal",  pts:4},
+  {key:"sf",    label:"Semifinal",     pts:8},
+  {key:"final", label:"Final",         pts:12},
+  {key:"won",   label:"Champion 🏆",   pts:20},
 ];
 
-const STAGE_ORDER = ["group","elim","r16","qf","sf","final","won"];
+const STAGE_ORDER = ["group","elim","r32","r16","qf","sf","final","won"];
 const POINTS = Object.fromEntries(STATUSES.map(s=>[s.key,s.pts]));
+
+// Map football-data.org stage strings → our keys
+// 2026 WC has GROUP_STAGE, ROUND_OF_32, ROUND_OF_16, QUARTER_FINALS, SEMI_FINALS, FINAL
+const STAGE_MAP = {
+  "GROUP_STAGE":    "group",
+  "ROUND_OF_32":    "r32",
+  "ROUND_OF_16":    "r16",
+  "QUARTER_FINALS": "qf",
+  "SEMI_FINALS":    "sf",
+  "FINAL":          "won",
+};
+
+// Normalize team names from API to our names
+const NAME_MAP = {
+  "Korea Republic":"South Korea",
+  "DR Congo":"DR Congo",
+  "Democratic Republic of Congo":"DR Congo",
+  "Congo DR":"DR Congo",
+  "USA":"United States",
+  "Côte d'Ivoire":"Ivory Coast",
+  "Curaçao":"Curacao",
+  "Czechia":"Czech Republic",
+  "Bosnia and Herzegovina":"Bosnia and Herzegovina",
+};
+
+function normalizeName(n) { return NAME_MAP[n] || n; }
 
 let teamStatus = {};
 ALL_TEAMS.forEach(t => teamStatus[t.team] = "group");
 
+// Stores which teams' statuses came from the API (so we can show "auto" badge)
+let autoUpdatedTeams = new Set();
+
 let BIN_ID = localStorage.getItem("wc2026_bin_id") || "";
 let API_KEY = localStorage.getItem("wc2026_api_key") || "";
+let FOOTBALL_KEY = localStorage.getItem("wc2026_football_key") || "e8871e1eec5744018d0b025a30c2d4db";
 let saveMsg = "";
 let isSaving = false;
 let currentTab = "leaderboard";
 let scoreMode = "points";
+let lastAutoUpdate = null;
 
 function setSyncState(state, msg) {
   const dot = document.getElementById("syncDot");
   const txt = document.getElementById("syncMsg");
-  if (!dot) return;
-  dot.className = "sync-dot " + state;
-  txt.textContent = msg;
+  if (dot) dot.className = "sync-dot " + state;
+  if (txt) txt.textContent = msg;
 }
+
+function setAutoMsg(msg) {
+  const el = document.getElementById("autoMsg");
+  if (el) el.textContent = msg;
+}
+
+// ─── football-data.org auto-update ───────────────────────────────────────────
+
+async function fetchLiveScores() {
+  if (!FOOTBALL_KEY) { setAutoMsg("Scores: no API key"); return; }
+  setAutoMsg("Scores: fetching…");
+  try {
+    // Fetch all WC matches
+    const r = await fetch("https://api.football-data.org/v4/competitions/WC/matches", {
+      headers: { "X-Auth-Token": FOOTBALL_KEY }
+    });
+    if (!r.ok) { setAutoMsg("Scores: API error " + r.status); return; }
+    const data = await r.json();
+    if (!data.matches) { setAutoMsg("Scores: no data"); return; }
+
+    // Build a map of team name → best stage reached
+    const teamBestStage = {};
+
+    data.matches.forEach(match => {
+      if (match.status !== "FINISHED") return;
+      const stage = match.stage;
+      const stageKey = STAGE_MAP[stage];
+      if (!stageKey) return;
+
+      const home = normalizeName(match.homeTeam?.name || match.homeTeam?.shortName || "");
+      const away = normalizeName(match.awayTeam?.name || match.awayTeam?.shortName || "");
+      const homeScore = match.score?.fullTime?.home ?? match.score?.fullTime?.homeTeam;
+      const awayScore = match.score?.fullTime?.away ?? match.score?.fullTime?.awayTeam;
+
+      // Both teams played in this stage — they at least reached it
+      // Winner advances further (handled by next round appearing), loser is eliminated from THIS stage
+      // We set both teams to at least this stage
+      function promote(name, stageKey) {
+        if (!name) return;
+        const current = teamBestStage[name] || "group";
+        if (STAGE_ORDER.indexOf(stageKey) > STAGE_ORDER.indexOf(current)) {
+          teamBestStage[name] = stageKey;
+        }
+      }
+
+      if (stage === "GROUP_STAGE") {
+        // In group stage, both teams are still "group" until group ends
+        // We'll handle elimination after group stage via knockout rounds
+        promote(home, "group");
+        promote(away, "group");
+      } else {
+        // Knockout: loser is eliminated, winner advances to next stage
+        // But we don't know next stage yet — the match IN this stage means they reached it
+        promote(home, stageKey);
+        promote(away, stageKey);
+
+        // Determine winner and loser
+        let winner = null, loser = null;
+        if (homeScore !== null && awayScore !== null) {
+          if (homeScore > awayScore) { winner = home; loser = away; }
+          else if (awayScore > homeScore) { winner = away; loser = home; }
+          else {
+            // Check penalties
+            const homePen = match.score?.penalties?.home ?? match.score?.penalties?.homeTeam;
+            const awayPen = match.score?.penalties?.away ?? match.score?.penalties?.awayTeam;
+            if (homePen !== null && awayPen !== null) {
+              if (homePen > awayPen) { winner = home; loser = away; }
+              else { winner = away; loser = home; }
+            }
+          }
+        }
+        // Mark loser as eliminated from knockouts
+        // Only mark elim if they haven't advanced further (i.e., they lost HERE)
+        if (loser) {
+          // Don't overwrite if they have a later stage
+          const current = teamBestStage[loser] || "group";
+          if (STAGE_ORDER.indexOf(current) <= STAGE_ORDER.indexOf(stageKey)) {
+            teamBestStage[loser] = "elim";
+          }
+        }
+        // Winner of final = champion
+        if (stage === "FINAL" && winner) {
+          teamBestStage[winner] = "won";
+        }
+      }
+    });
+
+    // After processing all matches, figure out who got eliminated in group stage
+    // Any team that doesn't appear in ROUND_OF_32 matches is out after group stage
+    const knockoutTeams = new Set();
+    data.matches.forEach(match => {
+      if (match.stage !== "GROUP_STAGE" && match.status === "FINISHED") {
+        knockoutTeams.add(normalizeName(match.homeTeam?.name || ""));
+        knockoutTeams.add(normalizeName(match.awayTeam?.name || ""));
+      }
+    });
+
+    // Check if group stage is fully done (all 72 group matches finished)
+    const groupMatches = data.matches.filter(m => m.stage === "GROUP_STAGE");
+    const groupFinished = groupMatches.filter(m => m.status === "FINISHED").length;
+    const groupTotal = groupMatches.length;
+    const groupStageDone = groupTotal > 0 && groupFinished === groupTotal;
+
+    if (groupStageDone) {
+      ALL_TEAMS.forEach(t => {
+        const name = t.team;
+        if (!knockoutTeams.has(name) && !teamBestStage[name]) {
+          teamBestStage[name] = "elim";
+        }
+      });
+    }
+
+    // Apply to our teamStatus, track which were auto-updated
+    autoUpdatedTeams.clear();
+    let changed = false;
+    ALL_TEAMS.forEach(t => {
+      const apiStage = teamBestStage[t.team];
+      if (apiStage && apiStage !== teamStatus[t.team]) {
+        teamStatus[t.team] = apiStage;
+        autoUpdatedTeams.add(t.team);
+        changed = true;
+      }
+    });
+
+    lastAutoUpdate = new Date();
+    setAutoMsg("Scores: updated " + lastAutoUpdate.toLocaleTimeString());
+
+    if (changed) {
+      // Auto-save to JSONBin so everyone gets the update
+      await saveData(true);
+    }
+
+    renderAll();
+  } catch(e) {
+    setAutoMsg("Scores: error — " + e.message);
+  }
+}
+
+// ─── JSONBin sync ─────────────────────────────────────────────────────────────
 
 async function loadData() {
   if (!BIN_ID || !API_KEY) { setSyncState("err","Not configured — see Setup tab"); renderAll(); return; }
   setSyncState("loading","Loading…");
   try {
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":API_KEY}});
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {headers:{"X-Master-Key":API_KEY}});
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
     if (d.record && d.record.teamStatus) Object.assign(teamStatus, d.record.teamStatus);
@@ -232,29 +412,34 @@ async function loadData() {
   renderAll();
 }
 
-async function saveData() {
-  if (!BIN_ID || !API_KEY) { alert("Configure JSONBin first in the Setup tab."); return; }
-  isSaving = true;
-  setSyncState("loading","Saving…");
-  renderUpdate();
+async function saveData(silent = false) {
+  if (!BIN_ID || !API_KEY) { if (!silent) alert("Configure JSONBin first in the Setup tab."); return; }
+  if (!silent) { isSaving = true; setSyncState("loading","Saving…"); renderUpdate(); }
   try {
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},
-      body:JSON.stringify({teamStatus, updatedAt:new Date().toISOString()})
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: "PUT",
+      headers: {"Content-Type":"application/json","X-Master-Key":API_KEY},
+      body: JSON.stringify({teamStatus, updatedAt: new Date().toISOString()})
     });
     if (!r.ok) throw new Error(r.status);
     setSyncState("ok","Saved · " + new Date().toLocaleTimeString());
-    saveMsg = "✓ Saved! Everyone will see the updated standings.";
-  } catch(e) { setSyncState("err","Save failed"); saveMsg = "⚠ Save failed — check your API key."; }
-  isSaving = false;
-  renderAll();
-  setTimeout(()=>{ saveMsg=""; renderUpdate(); },4000);
+    if (!silent) saveMsg = "✓ Saved! Everyone will see the updated standings.";
+  } catch(e) {
+    setSyncState("err","Save failed");
+    if (!silent) saveMsg = "⚠ Save failed — check your API key.";
+  }
+  if (!silent) {
+    isSaving = false;
+    renderAll();
+    setTimeout(() => { saveMsg = ""; renderUpdate(); }, 4000);
+  }
 }
 
+// ─── Scoring helpers ──────────────────────────────────────────────────────────
+
 function sCls(s) {
-  const map = {group:"s-group",elim:"s-elim",r16:"s-r16",qf:"s-qf",sf:"s-sf",final:"s-final",won:"s-won"};
-  return map[s]||"s-group";
+  const map = {group:"s-group",elim:"s-elim",r32:"s-r32",r16:"s-r16",qf:"s-qf",sf:"s-sf",final:"s-final",won:"s-won"};
+  return map[s] || "s-group";
 }
 function sLabel(s) { return (STATUSES.find(x=>x.key===s)||STATUSES[0]).label; }
 function initials(n) { return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
@@ -262,7 +447,7 @@ function initials(n) { return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUp
 function bestStage(teams) {
   let best = "elim";
   teams.forEach(t => {
-    const ts = teamStatus[t.team]||"group";
+    const ts = teamStatus[t.team] || "group";
     if (STAGE_ORDER.indexOf(ts) > STAGE_ORDER.indexOf(best)) best = ts;
   });
   return best;
@@ -271,8 +456,8 @@ function bestStage(teams) {
 function calcPointsScores() {
   return PEOPLE.map(p => {
     const myTeams = ALL_TEAMS.filter(t => t.person === p.name);
-    const pts = myTeams.reduce((s,t) => s+(POINTS[teamStatus[t.team]]||0), 0);
-    const alive = myTeams.filter(t => teamStatus[t.team] !== "elim").length;
+    const pts = myTeams.reduce((s,t) => s + (POINTS[teamStatus[t.team]] || 0), 0);
+    const alive = myTeams.filter(t => !["elim"].includes(teamStatus[t.team])).length;
     return {...p, pts, alive, myTeams, sortKey: pts * 1000 + alive};
   }).sort((a,b) => b.sortKey - a.sortKey);
 }
@@ -280,8 +465,7 @@ function calcPointsScores() {
 function calcLastStandingScores() {
   return PEOPLE.map(p => {
     const myTeams = ALL_TEAMS.filter(t => t.person === p.name);
-    const aliveTeams = myTeams.filter(t => !["elim"].includes(teamStatus[t.team]));
-    const alive = aliveTeams.length;
+    const alive = myTeams.filter(t => !["elim"].includes(teamStatus[t.team])).length;
     const best = bestStage(myTeams);
     const bestIdx = STAGE_ORDER.indexOf(best);
     const isOut = alive === 0;
@@ -289,55 +473,45 @@ function calcLastStandingScores() {
   }).sort((a,b) => b.sortKey - a.sortKey);
 }
 
+// ─── Render ───────────────────────────────────────────────────────────────────
+
 function renderLeaderboard() {
   const isPoints = scoreMode === "points";
   const scores = isPoints ? calcPointsScores() : calcLastStandingScores();
+  const autoCount = autoUpdatedTeams.size;
 
-  let h = `<div class="mode-toggle">
-    <button class="mode-btn ${isPoints?'active':''}" onclick="setMode('points')">Points</button>
-    <button class="mode-btn ${!isPoints?'active':''}" onclick="setMode('last')">Last standing</button>
+  let h = `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+    <div class="mode-toggle" style="margin-bottom:0">
+      <button class="mode-btn ${isPoints?'active':''}" onclick="setMode('points')">Points</button>
+      <button class="mode-btn ${!isPoints?'active':''}" onclick="setMode('last')">Last standing</button>
+    </div>
+    ${autoCount > 0 ? `<span class="auto-badge">⚡ ${autoCount} team${autoCount!==1?'s':''} auto-updated</span>` : ''}
   </div>`;
 
   if (!isPoints) {
-    h += `<div class="last-standing-info">
-      <strong>Last standing mode</strong> — whoever still has at least one team alive wins. If multiple people are still in, whoever has a team at the furthest stage ranks higher. When all your teams are out, you're eliminated from the prize.
-    </div>`;
+    h += `<div class="last-standing-info"><strong>Last standing</strong> — whoever still has a team alive wins. Tiebreaker: furthest stage reached, then most teams alive.</div>`;
   }
 
   h += `<div class="leaderboard">`;
-
-  let posCounter = 0;
-  let prevSortKey = null;
-
+  let posCounter = 0, prevKey = null;
   scores.forEach((p, i) => {
-    if (p.sortKey !== prevSortKey) posCounter = i + 1;
-    prevSortKey = p.sortKey;
-
-    let posLabel = posCounter;
-    let rowClass = "";
+    if (p.sortKey !== prevKey) posCounter = i + 1;
+    prevKey = p.sortKey;
+    let posLabel = posCounter, rowClass = "";
     if (!isPoints && p.isOut) { posLabel = "❌"; rowClass = "eliminated"; }
-    else if (posCounter === 1) { rowClass = "first"; posLabel = "🥇"; }
+    else if (posCounter === 1) { rowClass = "first";  posLabel = "🥇"; }
     else if (posCounter === 2) { rowClass = "second"; posLabel = "🥈"; }
-    else if (posCounter === 3) { rowClass = "third"; posLabel = "🥉"; }
-
+    else if (posCounter === 3) { rowClass = "third";  posLabel = "🥉"; }
     const picks = p.myTeams.map(t => {
-      const s = teamStatus[t.team]||"group";
+      const s = teamStatus[t.team] || "group";
       return `<span class="pick ${sCls(s)}">${FLAGS[t.team]||""} ${t.team}</span>`;
     }).join("");
-
     const nameExtra = p.note ? ` <span style="font-size:12px;color:var(--text-muted)">${p.note}</span>` : "";
-
-    let scoreHtml = "";
-    if (isPoints) {
-      scoreHtml = `<div class="score-n">${p.pts}</div><div class="score-sub">pts · ${p.alive} alive</div>`;
-    } else {
-      if (p.isOut) {
-        scoreHtml = `<div class="score-n" style="font-size:14px;color:var(--text-muted)">Out</div><div class="score-sub">all eliminated</div>`;
-      } else {
-        scoreHtml = `<div class="score-n">${p.alive}</div><div class="score-sub">team${p.alive!==1?'s':''} alive · best: ${sLabel(p.best)}</div>`;
-      }
-    }
-
+    let scoreHtml = isPoints
+      ? `<div class="score-n">${p.pts}</div><div class="score-sub">pts · ${p.alive} alive</div>`
+      : p.isOut
+        ? `<div class="score-n" style="font-size:14px;color:var(--text-muted)">Out</div><div class="score-sub">all eliminated</div>`
+        : `<div class="score-n">${p.alive}</div><div class="score-sub">team${p.alive!==1?'s':''} alive · ${sLabel(p.best)}</div>`;
     h += `<div class="lb-row ${rowClass}">
       <div class="lb-pos">${posLabel}</div>
       <div class="lb-avatar" style="background:${p.bg};color:${p.color}">${initials(p.name)}</div>
@@ -348,30 +522,32 @@ function renderLeaderboard() {
       <div class="lb-score">${scoreHtml}</div>
     </div>`;
   });
-
   h += `</div>`;
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
 
 function renderUpdate() {
-  let h = `<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Update each team's furthest stage reached. Save when done — leaderboard updates for everyone.</p>`;
+  let h = `<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Team statuses auto-update from live match data. You can also override manually.</p>`;
   CONFS.forEach(conf => {
     h += `<div class="section-title">${conf.label}</div><div class="team-list">`;
     conf.teams.forEach(team => {
-      const owner = ALL_TEAMS.find(t=>t.team===team)?.person||"";
+      const owner = ALL_TEAMS.find(t=>t.team===team)?.person || "";
       const p = PEOPLE.find(x=>x.name===owner);
-      const s = teamStatus[team]||"group";
+      const s = teamStatus[team] || "group";
+      const isAuto = autoUpdatedTeams.has(team);
       const opts = STATUSES.map(st=>`<option value="${st.key}" ${s===st.key?"selected":""}>${st.label}${st.pts>0?' (+'+st.pts+'pts)':''}</option>`).join("");
       h += `<div class="team-row">
         <div class="t-flag">${FLAGS[team]||"🏳"}</div>
         <div class="t-name">${team}<br><span class="t-owner" style="color:${p?p.color:"var(--text-muted)"}">${owner}${p&&p.note?' · '+p.note:''}</span></div>
+        ${isAuto ? `<span class="t-auto">⚡ auto</span>` : ''}
         <select class="t-select" onchange="updateTeam('${team.replace(/'/g,"\\'")}',this.value)">${opts}</select>
       </div>`;
     });
     h += `</div>`;
   });
   h += `<div class="save-area">
-    <button class="btn-save" onclick="saveData()" ${isSaving?"disabled":""}>Save for everyone</button>
+    <button class="btn" onclick="saveData(false)" ${isSaving?"disabled":""}>Save for everyone</button>
+    <button class="btn btn-secondary" onclick="fetchLiveScores()">⚡ Refresh live scores</button>
     <span class="save-msg">${saveMsg}</span>
   </div>`;
   document.getElementById("tab-update").innerHTML = h;
@@ -384,52 +560,59 @@ function renderScoring() {
     <table>
       <tr><td>Group stage</td><td>0 pts</td></tr>
       <tr><td>Eliminated</td><td>0 pts</td></tr>
+      <tr><td>Round of 32 <span style="font-size:11px;color:var(--text-muted)">(new in 2026!)</span></td><td>+1 pt per team</td></tr>
       <tr><td>Round of 16</td><td>+2 pts per team</td></tr>
       <tr><td>Quarterfinal</td><td>+4 pts per team</td></tr>
       <tr><td>Semifinal</td><td>+8 pts per team</td></tr>
       <tr><td>Final</td><td>+12 pts per team</td></tr>
       <tr><td>Champion 🏆</td><td>+20 pts per team</td></tr>
     </table>
-    <p class="note">Points are cumulative — a team reaching the SF earns 14 pts total (2+4+8). Your score is the sum across all your picked teams. 1st, 2nd and 3rd place by total points win prizes.</p>
+    <p class="note">Points are cumulative — a team reaching the SF earns 15 pts total (1+2+4+8). Your score = sum of all your teams' points. 2026 adds a new Round of 32 before the Round of 16.</p>
   </div>
   <div class="divider"></div>
   <div class="scoring-card">
     <h3>Last standing mode — survival</h3>
     <table>
-      <tr><td>Have at least one team still in</td><td>Still alive</td></tr>
-      <tr><td>All your teams eliminated</td><td>Out ❌</td></tr>
-      <tr><td>Tiebreaker</td><td>Furthest stage reached</td></tr>
-      <tr><td>Second tiebreaker</td><td>Most teams still alive</td></tr>
+      <tr><td>At least one team alive</td><td>Still in</td></tr>
+      <tr><td>All teams eliminated</td><td>Out ❌</td></tr>
+      <tr><td>Tiebreaker 1</td><td>Furthest stage reached</td></tr>
+      <tr><td>Tiebreaker 2</td><td>Most teams still alive</td></tr>
     </table>
-    <p class="note">Think of it like a last-man-standing pool. The last person with a team still playing wins. If multiple people are in the same round, whoever has a team at the furthest stage ranks higher. Prize goes to whoever outlasts everyone else — or whoever's team wins the cup.</p>
+    <p class="note">Last person with a team still playing wins. Prize goes to whoever outlasts everyone else — or whose team lifts the trophy.</p>
   </div>
   <div class="divider"></div>
   <div class="scoring-card" style="background:var(--amber-light);border-color:#EF9F27">
-    <h3 style="color:var(--amber)">Prize breakdown (from original rules)</h3>
+    <h3 style="color:var(--amber)">Prize breakdown</h3>
     <table>
       <tr><td>1st place</td><td style="color:var(--amber)">$50</td></tr>
       <tr><td>2nd place</td><td style="color:var(--amber)">$30</td></tr>
       <tr><td>3rd place</td><td style="color:var(--amber)">$16</td></tr>
-      <tr><td>Entry</td><td style="color:var(--amber)">$2 per team picked</td></tr>
+      <tr><td>Entry</td><td style="color:var(--amber)">$2 per team</td></tr>
     </table>
-    <p class="note" style="color:var(--amber)">Steve and AG drew 4 teams each. Everyone else drew 5.</p>
+    <p class="note" style="color:var(--amber)">Steve and AG picked 4 teams each. Everyone else picked 5.</p>
   </div>`;
 }
 
 function renderSetup() {
   document.getElementById("tab-setup").innerHTML = `
-  <div class="setup-box">
-    <h2>Connect to JSONBin (free live sync)</h2>
-    <p>JSONBin stores scores online so everyone sees live updates. Takes about 2 minutes.</p>
-    <p><strong>Step 1:</strong> Go to <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → sign up free → Dashboard → API Keys → copy your <strong>Master Key</strong>.</p>
-    <p><strong>Step 2:</strong> Click "Create Bin" → paste this as the content: <code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">{"teamStatus":{}}</code> → Save. Copy the <strong>Bin ID</strong> from the URL.</p>
-    <p><strong>Step 3:</strong> Paste both below and click Save settings.</p>
+  <div class="info-box">
+    <h2>⚡ Live scores (football-data.org)</h2>
+    <p>Your API key is pre-loaded and scores will update automatically. If you ever need to update it:</p>
+    <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px">football-data.org API key</label>
+    <input type="text" id="inp-football" value="${FOOTBALL_KEY}" placeholder="e.g. e8871e1eec5744018d0b025a30c2d4db">
+    <button class="btn" onclick="saveFootballKey()">Update key</button>
+    <p class="note" style="margin-top:12px">Free tier limit: 10 calls/minute. The site checks for updates every 5 minutes — well within limits.</p>
+  </div>
+  <div class="divider"></div>
+  <div class="info-box">
+    <h2>☁️ Live sync (JSONBin)</h2>
+    <p>Stores scores online so everyone sees the same leaderboard. <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → sign up free → get Master Key + Bin ID.</p>
     <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px">Master Key (starts with $2a…)</label>
     <input type="password" id="inp-key" placeholder="$2a$10$..." value="${API_KEY}">
-    <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px">Bin ID (24 character string)</label>
+    <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px">Bin ID</label>
     <input type="text" id="inp-bin" placeholder="64abc123def456..." value="${BIN_ID}">
-    <button class="btn-save" onclick="saveSettings()">Save settings &amp; connect</button>
-    <p class="note" style="margin-top:14px">Keys are saved in your browser only. To skip the setup step for everyone, open index.html in a text editor and replace the two <code>localStorage.getItem</code> lines with your actual values hardcoded.</p>
+    <button class="btn" onclick="saveSettings()">Save &amp; connect</button>
+    <p class="note" style="margin-top:12px">Keys saved in your browser. To skip setup for everyone, hardcode them in the HTML before uploading to GitHub.</p>
   </div>`;
 }
 
@@ -440,25 +623,23 @@ function renderAll() {
   renderSetup();
 }
 
+// ─── Event handlers ───────────────────────────────────────────────────────────
+
 function showTab(name, btn) {
   currentTab = name;
   ["leaderboard","update","scoring","setup"].forEach(t => {
-    document.getElementById("tab-"+t).style.display = t===name?"block":"none";
+    document.getElementById("tab-"+t).style.display = t===name ? "block" : "none";
   });
   document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
 }
-
-function setMode(m) {
-  scoreMode = m;
-  renderLeaderboard();
+function setMode(m) { scoreMode = m; renderLeaderboard(); }
+function updateTeam(team, val) { teamStatus[team] = val; renderLeaderboard(); }
+function saveFootballKey() {
+  FOOTBALL_KEY = document.getElementById("inp-football").value.trim();
+  localStorage.setItem("wc2026_football_key", FOOTBALL_KEY);
+  fetchLiveScores();
 }
-
-function updateTeam(team, val) {
-  teamStatus[team] = val;
-  renderLeaderboard();
-}
-
 function saveSettings() {
   BIN_ID = document.getElementById("inp-bin").value.trim();
   API_KEY = document.getElementById("inp-key").value.trim();
@@ -467,15 +648,20 @@ function saveSettings() {
   loadData();
 }
 
-window.showTab = showTab;
-window.setMode = setMode;
-window.updateTeam = updateTeam;
-window.saveData = saveData;
-window.saveSettings = saveSettings;
+window.showTab = showTab; window.setMode = setMode; window.updateTeam = updateTeam;
+window.saveData = saveData; window.saveSettings = saveSettings;
+window.fetchLiveScores = fetchLiveScores; window.saveFootballKey = saveFootballKey;
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
 
 renderAll();
 loadData();
-setInterval(() => { if (currentTab === "leaderboard") loadData(); }, 60000);
+fetchLiveScores();
+
+// Refresh live scores every 5 minutes
+setInterval(fetchLiveScores, 5 * 60 * 1000);
+// Refresh JSONBin leaderboard every 60 seconds
+setInterval(() => { if (currentTab === "leaderboard") loadData(); }, 60 * 1000);
 </script>
 </body>
 </html>
