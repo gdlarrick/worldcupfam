@@ -754,10 +754,9 @@ function renderLiveScores() {
       scoreHtml = `<span class="ls-score">${hs} – ${as2}</span>`;
     } else {
       const kickoff = m._kickoff || new Date(m.utcDate);
-      const isToday = kickoff.toDateString() === todayStr;
       const timeStr = kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      const dateStr = kickoff.toLocaleDateString([], {month:'short', day:'numeric'});
-      metaLeft = `<div class="ls-kick-label">${isToday ? timeStr : dateStr + ' · ' + timeStr}</div>`;
+      const dateStr = kickoff.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
+      metaLeft = `<div class="ls-kick-label">${dateStr} · ${timeStr}</div>`;
       scoreHtml = `<span class="ls-vs">vs</span>`;
     }
 
