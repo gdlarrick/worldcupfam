@@ -59,6 +59,34 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .upcoming-match { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
 .upcoming-teams { flex: 1; color: var(--text); font-weight: 500; }
 .upcoming-time { white-space: nowrap; }
+/* Head to head */
+.h2h-selectors { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.h2h-select { flex: 1; min-width: 120px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer; }
+.h2h-vs { font-size: 13px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+.h2h-banner { display: flex; align-items: stretch; gap: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+.h2h-side { flex: 1; padding: 20px 16px; text-align: center; }
+.h2h-side.left { border-right: 1px solid var(--border); }
+.h2h-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; margin: 0 auto 8px; }
+.h2h-pname { font-size: 16px; font-weight: 600; }
+.h2h-psub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.h2h-big { font-size: 36px; font-weight: 700; margin-top: 8px; }
+.h2h-mid { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 12px; gap: 4px; }
+.h2h-mid-score { font-size: 11px; color: var(--text-muted); text-align: center; }
+.h2h-result { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+.h2h-win  { background: var(--green-light); color: var(--green-dark); }
+.h2h-lose { background: var(--coral-light); color: var(--coral); }
+.h2h-draw { background: var(--gray-light); color: var(--gray); }
+.h2h-matches { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.h2h-match { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; }
+.h2h-match-teams { flex: 1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.h2h-match-score { font-size: 15px; font-weight: 700; padding: 0 6px; }
+.h2h-match-stage { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.h2h-match.left-win { border-left: 3px solid #639922; }
+.h2h-match.right-win { border-left: 3px solid var(--coral); }
+.h2h-match.draw { border-left: 3px solid var(--text-muted); }
+.h2h-match.pending { border-left: 3px solid var(--amber); opacity: .8; }
+.h2h-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+.h2h-section-title { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 16px 0 8px; }
 .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tab { font-size: 14px; padding: 8px 16px; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; white-space: nowrap; }
 .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--text); }
@@ -157,11 +185,13 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
   <div class="tabs">
     <button class="tab active" onclick="showTab('leaderboard',this)">Leaderboard</button>
+    <button class="tab" onclick="showTab('h2h',this)">Head to head</button>
     <button class="tab" onclick="showTab('teams',this)">All teams</button>
     <button class="tab" onclick="showTab('scoring',this)">Scoring</button>
   </div>
 
   <div id="tab-leaderboard"></div>
+  <div id="tab-h2h" style="display:none"></div>
   <div id="tab-teams" style="display:none"></div>
   <div id="tab-scoring" style="display:none"></div>
 </div>
@@ -205,7 +235,7 @@ const FLAGS = {
   "Iraq":"🇮🇶","Ghana":"🇬🇭","Mexico":"🇲🇽","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Belgium":"🇧🇪",
   "Japan":"🇯🇵","South Africa":"🇿🇦","Argentina":"🇦🇷","Germany":"🇩🇪","Uruguay":"🇺🇾",
   "Iran":"🇮🇷","DR Congo":"🇨🇩","Canada":"🇨🇦","Switzerland":"🇨🇭","Paraguay":"🇵🇾",
-  "Jordan":"🇯🇴","Egypt":"🇪🇬","Brazil":"🇧🇷","Turkey":"🇹🇷","Bosnia and Herzegovina":"🇧🇦",
+  "Jordan":"🇯🇴","Egypt":"🇪🇬","Brazil":"🇧🇷","Turkey":"🇹🇷","Bosnia and Herzegovina":"🇧🇦","Bosnia & Herzegovina":"🇧🇦","Bosnia-Herzegovina":"🇧🇦",
   "Australia":"🇦🇺","Ivory Coast":"🇨🇮","United States":"🇺🇸","Netherlands":"🇳🇱","Czech Republic":"🇨🇿",
   "New Zealand":"🇳🇿","Morocco":"🇲🇦","Curacao":"🇨🇼","Sweden":"🇸🇪","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿",
   "Saudi Arabia":"🇸🇦","Cape Verde":"🇨🇻","Panama":"🇵🇦","France":"🇫🇷","Austria":"🇦🇹",
@@ -215,6 +245,9 @@ const NAME_MAP = {
   "Korea Republic":"South Korea","Democratic Republic of Congo":"DR Congo",
   "Congo DR":"DR Congo","USA":"United States","Côte d'Ivoire":"Ivory Coast",
   "Curaçao":"Curacao","Czechia":"Czech Republic",
+  "Bosnia & Herzegovina":"Bosnia and Herzegovina",
+  "Bosnia-Herzegovina":"Bosnia and Herzegovina",
+  "Bosnia":"Bosnia and Herzegovina",
 };
 function norm(n) { return NAME_MAP[n] || n; }
 
@@ -263,6 +296,7 @@ async function fetchScores() {
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = await r.json();
     if (!data.matches) throw new Error("No matches in response");
+    allMatches = data.matches;
     processMatches(data.matches);
     renderLiveBanner(data.matches);
     lastUpdated = new Date();
@@ -698,10 +732,177 @@ function renderLiveBanner(matches) {
   }
 }
 
-function renderAll() { renderLeaderboard(); renderTeams(); renderScoring(); }
+let allMatches = [];
+let h2hLeft = "Gretchen";
+let h2hRight = "Simon";
+
+function renderH2H() {
+  const el = document.getElementById("tab-h2h");
+  if (!el) return;
+
+  const pLeft  = PEOPLE.find(p => p.name === h2hLeft);
+  const pRight = PEOPLE.find(p => p.name === h2hRight);
+  if (!pLeft || !pRight) return;
+
+  const leftTeams  = new Set(ALL_TEAMS.filter(t => t.person === h2hLeft).map(t => t.team));
+  const rightTeams = new Set(ALL_TEAMS.filter(t => t.person === h2hRight).map(t => t.team));
+
+  // Find all matches between a left team and a right team
+  const clashes = [];
+  allMatches.forEach(m => {
+    const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+    const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+    const homeIsLeft  = leftTeams.has(home),  homeIsRight = rightTeams.has(home);
+    const awayIsLeft  = leftTeams.has(away),  awayIsRight = rightTeams.has(away);
+    if ((homeIsLeft && awayIsRight) || (homeIsRight && awayIsLeft)) {
+      clashes.push({m, home, away, homeIsLeft, homeIsRight});
+    }
+  });
+
+  // Tally wins
+  let leftWins = 0, rightWins = 0, draws = 0;
+  clashes.forEach(({m, home, away, homeIsLeft}) => {
+    if (m.status !== "FINISHED") return;
+    const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
+    const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
+    if (hs == null || as2 == null) return;
+    let winner = null;
+    if (hs > as2) winner = "home";
+    else if (as2 > hs) winner = "away";
+    else {
+      const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+      const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+      if (hp != null && ap != null) winner = hp > ap ? "home" : "away";
+    }
+    if (!winner) { draws++; return; }
+    const leftWon = (winner === "home" && homeIsLeft) || (winner === "away" && !homeIsLeft);
+    if (leftWon) leftWins++; else rightWins++;
+  });
+
+  // Points comparison
+  const leftPts  = ALL_TEAMS.filter(t => t.person === h2hLeft).reduce((s,t)  => s+(POINTS[teamStatus[t.team]]||0), 0);
+  const rightPts = ALL_TEAMS.filter(t => t.person === h2hRight).reduce((s,t) => s+(POINTS[teamStatus[t.team]]||0), 0);
+  const leftAlive  = ALL_TEAMS.filter(t => t.person === h2hLeft  && teamStatus[t.team] !== "elim").length;
+  const rightAlive = ALL_TEAMS.filter(t => t.person === h2hRight && teamStatus[t.team] !== "elim").length;
+
+  const totalClash = leftWins + rightWins + draws;
+  let resultLabel = "", resultCls = "";
+  if (totalClash === 0) { resultLabel = "No clashes yet"; resultCls = "h2h-draw"; }
+  else if (leftWins > rightWins) { resultLabel = `${h2hLeft} leads`; resultCls = "h2h-win"; }
+  else if (rightWins > leftWins) { resultLabel = `${h2hRight} leads`; resultCls = "h2h-lose"; }
+  else { resultLabel = "Even"; resultCls = "h2h-draw"; }
+
+  // People selector
+  const opts = PEOPLE.map(p => `<option value="${p.name}" ${p.name===h2hLeft?"selected":""}>${p.name}${p.note?' ('+p.note+')':''}</option>`).join("");
+  const opts2 = PEOPLE.map(p => `<option value="${p.name}" ${p.name===h2hRight?"selected":""}>${p.name}${p.note?' ('+p.note+')':''}</option>`).join("");
+
+  let h = `<div class="h2h-selectors">
+    <select class="h2h-select" onchange="setH2H('left',this.value)">${opts}</select>
+    <span class="h2h-vs">vs</span>
+    <select class="h2h-select" onchange="setH2H('right',this.value)">${opts2}</select>
+  </div>`;
+
+  // Banner
+  h += `<div class="h2h-banner">
+    <div class="h2h-side left">
+      <div class="h2h-avatar" style="background:${pLeft.bg};color:${pLeft.color}">${initials(pLeft.name)}</div>
+      <div class="h2h-pname">${pLeft.name}</div>
+      ${pLeft.note ? `<div class="h2h-psub">${pLeft.note}</div>` : ''}
+      <div class="h2h-big" style="color:${pLeft.color}">${leftWins}</div>
+      <div style="font-size:11px;color:var(--text-muted)">clash wins</div>
+      <div style="font-size:13px;margin-top:8px;font-weight:500">${leftPts} pts · ${leftAlive} alive</div>
+    </div>
+    <div class="h2h-mid">
+      <span class="h2h-result ${resultCls}">${resultLabel}</span>
+      ${draws > 0 ? `<div class="h2h-mid-score">${draws} draw${draws!==1?'s':''}</div>` : ''}
+      <div class="h2h-mid-score" style="margin-top:8px">${totalClash} clash${totalClash!==1?'es':''}</div>
+    </div>
+    <div class="h2h-side">
+      <div class="h2h-avatar" style="background:${pRight.bg};color:${pRight.color}">${initials(pRight.name)}</div>
+      <div class="h2h-pname">${pRight.name}</div>
+      ${pRight.note ? `<div class="h2h-psub">${pRight.note}</div>` : ''}
+      <div class="h2h-big" style="color:${pRight.color}">${rightWins}</div>
+      <div style="font-size:11px;color:var(--text-muted)">clash wins</div>
+      <div style="font-size:13px;margin-top:8px;font-weight:500">${rightPts} pts · ${rightAlive} alive</div>
+    </div>
+  </div>`;
+
+  // Clash matches
+  if (clashes.length === 0) {
+    h += `<div class="h2h-empty">
+      <div style="font-size:32px;margin-bottom:8px">⚽</div>
+      No matches scheduled between ${h2hLeft}'s and ${h2hRight}'s teams yet.<br>
+      <span style="font-size:12px">Check back once the group stage draws are finalized.</span>
+    </div>`;
+  } else {
+    const finished = clashes.filter(c => c.m.status === "FINISHED");
+    const pending  = clashes.filter(c => c.m.status !== "FINISHED");
+
+    if (finished.length > 0) {
+      h += `<div class="h2h-section-title">Played matches</div><div class="h2h-matches">`;
+      finished.forEach(({m, home, away, homeIsLeft}) => {
+        const hs  = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam ?? 0;
+        const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam ?? 0;
+        const hp  = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+        const ap  = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+        let winner = null;
+        if (hs > as2) winner = "home";
+        else if (as2 > hs) winner = "away";
+        else if (hp != null && ap != null) winner = hp > ap ? "home" : "away";
+        const leftWon  = winner && ((winner==="home" && homeIsLeft) || (winner==="away" && !homeIsLeft));
+        const rightWon = winner && !leftWon;
+        const rowCls   = !winner ? "draw" : leftWon ? "left-win" : "right-win";
+        const stageStr = (STATUSES.find(s2 => API_STAGE_MAP[m.stage] === s2.key) || {label: m.stage||""}).label;
+        const penStr   = hp != null ? ` (${hp}–${ap} pens)` : "";
+        const leftTeam  = homeIsLeft ? home : away;
+        const rightTeam = homeIsLeft ? away : home;
+        const leftScore  = homeIsLeft ? hs : as2;
+        const rightScore = homeIsLeft ? as2 : hs;
+        h += `<div class="h2h-match ${rowCls}">
+          <div class="h2h-match-teams">
+            <span style="color:${pLeft.color};font-weight:500">${FLAGS[leftTeam]||""} ${leftTeam}</span>
+            <span class="h2h-match-score" style="color:${leftWon?pLeft.color:rightWon?pRight.color:'var(--text-muted)'}">${leftScore} – ${rightScore}${penStr}</span>
+            <span style="color:${pRight.color};font-weight:500">${FLAGS[rightTeam]||""} ${rightTeam}</span>
+          </div>
+          <div class="h2h-match-stage">${stageStr}</div>
+        </div>`;
+      });
+      h += `</div>`;
+    }
+
+    if (pending.length > 0) {
+      h += `<div class="h2h-section-title">Upcoming clashes</div><div class="h2h-matches">`;
+      pending.forEach(({m, home, away, homeIsLeft}) => {
+        const kickoff = m.utcDate ? new Date(m.utcDate).toLocaleDateString([], {month:'short',day:'numeric'}) + " · " + new Date(m.utcDate).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "TBD";
+        const leftTeam  = homeIsLeft ? home : away;
+        const rightTeam = homeIsLeft ? away : home;
+        h += `<div class="h2h-match pending">
+          <div class="h2h-match-teams">
+            <span style="color:${pLeft.color};font-weight:500">${FLAGS[leftTeam]||""} ${leftTeam}</span>
+            <span class="h2h-match-score" style="color:var(--text-muted)">vs</span>
+            <span style="color:${pRight.color};font-weight:500">${FLAGS[rightTeam]||""} ${rightTeam}</span>
+          </div>
+          <div class="h2h-match-stage">${kickoff}</div>
+        </div>`;
+      });
+      h += `</div>`;
+    }
+  }
+
+  el.innerHTML = h;
+}
+
+function setH2H(side, val) {
+  if (side === "left") h2hLeft = val;
+  else h2hRight = val;
+  renderH2H();
+}
+window.setH2H = setH2H;
+
+function renderAll() { renderLeaderboard(); renderTeams(); renderScoring(); renderH2H(); }
 
 function showTab(name, btn) {
-  ["leaderboard","teams","scoring"].forEach(t => {
+  ["leaderboard","h2h","teams","scoring"].forEach(t => {
     document.getElementById("tab-"+t).style.display = t===name?"block":"none";
   });
   document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
