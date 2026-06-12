@@ -190,6 +190,22 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .ls-score-live { color: #4ade80; animation: scorePulse .8s infinite; }
 .ls-vs { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .ls-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+/* Group standings */
+.gs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px; }
+.gs-group-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+.gs-table { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 11px; border-collapse: separate; border-spacing: 0; }
+.gs-table th { padding: 5px 6px; font-size: 10px; font-weight: 600; letter-spacing: .04em; color: var(--text-muted); background: var(--bg); border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+.gs-table th:nth-child(2) { text-align: left; }
+.gs-table td { padding: 7px 6px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: middle; }
+.gs-table tr:last-child td { border-bottom: none; }
+.gs-table td:nth-child(2) { text-align: left; }
+.gs-pos-cell { color: var(--text-muted); font-size: 11px; text-align: center !important; width: 14px; }
+.gs-team-cell { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.gs-tname { font-size: 11px; font-weight: 500; }
+.gs-pts { font-weight: 700; }
+.gs-qualified { background: rgba(59,109,17,.08); }
+.gs-maybe { background: rgba(186,117,23,.07); }
+@media(max-width:520px) { .gs-grid { grid-template-columns: 1fr; } }
 @media(max-width:480px) {
   .ls-match-row { grid-template-columns: 1fr auto 1fr; gap: 4px; padding: 10px 10px; }
   .ls-tname { font-size: 12px; }
@@ -617,6 +633,31 @@ function renderLeaderboard() {
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
 
+function buildGroupStandings() {
+  const groupMatches = allMatches.filter(m => m.stage === "GROUP_STAGE");
+  if (!groupMatches.length) return {};
+  const groups = {};
+  groupMatches.forEach(m => {
+    const grp = m.group;
+    if (!grp) return;
+    const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+    const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+    if (!home || !away) return;
+    if (!groups[grp]) groups[grp] = {};
+    [home, away].forEach(t => { if (!groups[grp][t]) groups[grp][t] = {p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}; });
+    if (m.status !== "FINISHED") return;
+    const hs = m.score?.fullTime?.home ?? 0;
+    const as2 = m.score?.fullTime?.away ?? 0;
+    groups[grp][home].p++; groups[grp][away].p++;
+    groups[grp][home].gf += hs; groups[grp][home].ga += as2;
+    groups[grp][away].gf += as2; groups[grp][away].ga += hs;
+    if (hs > as2) { groups[grp][home].w++; groups[grp][home].pts += 3; groups[grp][away].l++; }
+    else if (hs === as2) { groups[grp][home].d++; groups[grp][home].pts++; groups[grp][away].d++; groups[grp][away].pts++; }
+    else { groups[grp][away].w++; groups[grp][away].pts += 3; groups[grp][home].l++; }
+  });
+  return groups;
+}
+
 function renderTeams() {
   const CONFS = [
     {label:"AFC / OFC", teams:["South Korea","Uzbekistan","Qatar","Iraq","Japan","Iran","Jordan","Australia","New Zealand","Saudi Arabia"]},
@@ -626,6 +667,37 @@ function renderTeams() {
     {label:"CONMEBOL / UEFA (5th pick)", teams:["Croatia","Belgium","Uruguay","Paraguay","Bosnia and Herzegovina","Czech Republic","England","Austria"]},
   ];
   let h = "";
+
+  // Group standings
+  const groups = buildGroupStandings();
+  const groupKeys = Object.keys(groups).sort();
+  if (groupKeys.length > 0) {
+    h += `<div class="section-title">Group Standings</div><div class="gs-grid">`;
+    groupKeys.forEach(grp => {
+      const label = grp.replace("GROUP_", "Group ");
+      const teams = Object.entries(groups[grp])
+        .map(([name, s]) => ({name, ...s, gd: s.gf - s.ga}))
+        .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+      h += `<div class="gs-group"><div class="gs-group-label">${label}</div>
+        <table class="gs-table">
+          <tr><th>#</th><th>Team</th><th>P</th><th>GD</th><th>Pts</th></tr>`;
+      teams.forEach((t, i) => {
+        const owner = ALL_TEAMS.find(x => x.team === t.name)?.person;
+        const p = owner ? PEOPLE.find(x => x.name === owner) : null;
+        const tag = p ? `<span class="ls-owner-tag" style="background:${p.bg};color:${p.color}">${p.name}</span>` : '';
+        const gdStr = t.gd > 0 ? '+' + t.gd : String(t.gd);
+        const rowCls = i < 2 ? 'gs-qualified' : (i === 2 ? 'gs-maybe' : '');
+        h += `<tr class="${rowCls}">
+          <td class="gs-pos-cell">${i+1}</td>
+          <td><div class="gs-team-cell">${FLAGS[t.name]||''} <span class="gs-tname">${t.name}</span>${tag}</div></td>
+          <td>${t.p}</td><td>${gdStr}</td><td class="gs-pts">${t.pts}</td>
+        </tr>`;
+      });
+      h += `</table></div>`;
+    });
+    h += `</div><div class="divider"></div>`;
+  }
+
   CONFS.forEach(conf => {
     h += `<div class="section-title">${conf.label}</div><div class="team-list">`;
     conf.teams.forEach(team => {
