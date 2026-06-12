@@ -755,7 +755,7 @@ function renderLiveScores() {
     } else {
       const kickoff = m._kickoff || new Date(m.utcDate);
       const timeStr = kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      const dateStr = kickoff.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
+      const dateStr = kickoff.toLocaleDateString([], {month:'short', day:'numeric'});
       metaLeft = `<div class="ls-kick-label">${dateStr} · ${timeStr}</div>`;
       scoreHtml = `<span class="ls-vs">vs</span>`;
     }
@@ -859,7 +859,9 @@ function renderLiveBanner(matches) {
       const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
       const homeOwner = ALL_TEAMS.find(t => t.team === home)?.person;
       const awayOwner = ALL_TEAMS.find(t => t.team === away)?.person;
-      const kickoffStr = m.kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const kickoffDate = m.kickoff.toLocaleDateString([], {month:'short', day:'numeric'});
+      const kickoffTime = m.kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const kickoffStr = `${kickoffDate} · ${kickoffTime}`;
       // Only show if at least one team is in the pool
       if (!homeOwner && !awayOwner) return;
       const homeTag = homeOwner ? `<span class="live-pool-tag ${homeOwner==='Gretchen'?'live-yours':'live-family'}">${homeOwner}</span>` : "";
