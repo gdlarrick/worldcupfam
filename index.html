@@ -43,6 +43,22 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .sync-dot.loading { background: #BA7517; animation: pulse 1s infinite; }
 .sync-dot.err { background: #E24B4A; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+@keyframes scorePulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.live-banner { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.live-match { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: var(--radius); flex-wrap: wrap; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: scorePulse .8s infinite; }
+.live-teams { flex: 1; font-size: 13px; font-weight: 500; color: #f0f0ec; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.live-score { font-size: 16px; font-weight: 700; color: #4ade80; padding: 0 4px; }
+.live-minute { font-size: 11px; color: #86efac; white-space: nowrap; }
+.live-pool-tag { font-size: 11px; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+.live-yours { background: #534AB7; color: #CECBF6; }
+.live-family { background: #0C447C; color: #B5D4F4; }
+.upcoming-banner { margin-top: 10px; }
+.upcoming-title { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.upcoming-list { display: flex; flex-direction: column; gap: 4px; }
+.upcoming-match { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+.upcoming-teams { flex: 1; color: var(--text); font-weight: 500; }
+.upcoming-time { white-space: nowrap; }
 .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tab { font-size: 14px; padding: 8px 16px; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; white-space: nowrap; }
 .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--text); }
@@ -136,6 +152,7 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
       <div class="sync-dot loading" id="syncDot"></div>
       <span id="syncMsg">Loading live scores…</span>
     </div>
+    <div id="liveBanner"></div>
   </header>
 
   <div class="tabs">
@@ -247,6 +264,7 @@ async function fetchScores() {
     const data = await r.json();
     if (!data.matches) throw new Error("No matches in response");
     processMatches(data.matches);
+    renderLiveBanner(data.matches);
     lastUpdated = new Date();
     setSyncState("ok", "Live · updated " + lastUpdated.toLocaleTimeString());
   } catch(e) {
@@ -603,6 +621,81 @@ function renderScoring() {
     </table>
     <p class="note" style="color:var(--amber)">Steve and AG picked 4 teams each. Everyone else picked 5. Scores update automatically — no manual entry needed!</p>
   </div>`;
+}
+
+function renderLiveBanner(matches) {
+  const el = document.getElementById("liveBanner");
+  if (!el) return;
+
+  const poolTeams = new Set(ALL_TEAMS.map(t => t.team));
+
+  // Find live matches (IN_PLAY or PAUSED)
+  const live = matches.filter(m => m.status === "IN_PLAY" || m.status === "PAUSED");
+  // Find next 3 upcoming matches today
+  const now = new Date();
+  const upcoming = matches
+    .filter(m => m.status === "SCHEDULED" || m.status === "TIMED")
+    .map(m => ({...m, kickoff: new Date(m.utcDate)}))
+    .filter(m => m.kickoff > now)
+    .sort((a,b) => a.kickoff - b.kickoff)
+    .slice(0, 3);
+
+  let h = "";
+
+  if (live.length > 0) {
+    h += `<div class="live-banner">`;
+    live.forEach(m => {
+      const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+      const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+      const hs = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
+      const as2 = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
+      const min = m.minute ? m.minute + "'" : (m.status === "PAUSED" ? "HT" : "Live");
+      const homeOwner = ALL_TEAMS.find(t => t.team === home)?.person;
+      const awayOwner = ALL_TEAMS.find(t => t.team === away)?.person;
+      const homeTag = homeOwner ? `<span class="live-pool-tag ${homeOwner==='Gretchen'?'live-yours':'live-family'}">${homeOwner}</span>` : "";
+      const awayTag = awayOwner ? `<span class="live-pool-tag ${awayOwner==='Gretchen'?'live-yours':'live-family'}">${awayOwner}</span>` : "";
+      h += `<div class="live-match">
+        <div class="live-dot"></div>
+        <div class="live-teams">
+          ${FLAGS[home]||""} ${home} ${homeTag}
+          <span class="live-score">${hs} – ${as2}</span>
+          ${FLAGS[away]||""} ${away} ${awayTag}
+        </div>
+        <div class="live-minute">${min}</div>
+      </div>`;
+    });
+    h += `</div>`;
+  }
+
+  if (upcoming.length > 0) {
+    h += `<div class="upcoming-banner"><div class="upcoming-title">Upcoming today</div><div class="upcoming-list">`;
+    upcoming.forEach(m => {
+      const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+      const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+      const homeOwner = ALL_TEAMS.find(t => t.team === home)?.person;
+      const awayOwner = ALL_TEAMS.find(t => t.team === away)?.person;
+      const kickoffStr = m.kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      // Only show if at least one team is in the pool
+      if (!homeOwner && !awayOwner) return;
+      const homeTag = homeOwner ? `<span class="live-pool-tag ${homeOwner==='Gretchen'?'live-yours':'live-family'}">${homeOwner}</span>` : "";
+      const awayTag = awayOwner ? `<span class="live-pool-tag ${awayOwner==='Gretchen'?'live-yours':'live-family'}">${awayOwner}</span>` : "";
+      h += `<div class="upcoming-match">
+        <div class="upcoming-teams">${FLAGS[home]||""} ${home} ${homeTag} vs ${FLAGS[away]||""} ${away} ${awayTag}</div>
+        <div class="upcoming-time">${kickoffStr}</div>
+      </div>`;
+    });
+    h += `</div></div>`;
+  }
+
+  el.innerHTML = h;
+
+  // If there are live matches, refresh every 60 seconds instead of 5 min
+  if (live.length > 0 && !window._liveInterval) {
+    window._liveInterval = setInterval(fetchScores, 60 * 1000);
+  } else if (live.length === 0 && window._liveInterval) {
+    clearInterval(window._liveInterval);
+    window._liveInterval = null;
+  }
 }
 
 function renderAll() { renderLeaderboard(); renderTeams(); renderScoring(); }
