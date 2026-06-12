@@ -191,6 +191,7 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .ls-vs { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .ls-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 /* Group standings */
+.gs-legend { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
 .gs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px; }
 .gs-group-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
 .gs-table { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 11px; border-collapse: separate; border-spacing: 0; }
@@ -672,7 +673,9 @@ function renderTeams() {
   const groups = buildGroupStandings();
   const groupKeys = Object.keys(groups).sort();
   if (groupKeys.length > 0) {
-    h += `<div class="section-title">Group Standings</div><div class="gs-grid">`;
+    h += `<div class="section-title">Group Standings</div>
+    <div class="gs-legend">Pld = Played &nbsp;·&nbsp; W = Wins &nbsp;·&nbsp; D = Draws &nbsp;·&nbsp; L = Losses &nbsp;·&nbsp; GD = Goal Diff &nbsp;·&nbsp; Pts = Points</div>
+    <div class="gs-grid">`;
     groupKeys.forEach(grp => {
       const label = grp.replace("GROUP_", "Group ");
       const teams = Object.entries(groups[grp])
