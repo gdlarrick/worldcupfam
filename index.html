@@ -192,7 +192,7 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .ls-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 /* Group standings */
 .gs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px; }
-.gs-group-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+.gs-group-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
 .gs-table { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 11px; border-collapse: separate; border-spacing: 0; }
 .gs-table th { padding: 5px 6px; font-size: 10px; font-weight: 600; letter-spacing: .04em; color: var(--text-muted); background: var(--bg); border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
 .gs-table th:nth-child(2) { text-align: left; }
@@ -680,7 +680,7 @@ function renderTeams() {
         .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
       h += `<div class="gs-group"><div class="gs-group-label">${label}</div>
         <table class="gs-table">
-          <tr><th>#</th><th>Team</th><th>P</th><th>GD</th><th>Pts</th></tr>`;
+          <tr><th>#</th><th>Team</th><th title="Played">Pld</th><th title="Wins">W</th><th title="Draws">D</th><th title="Losses">L</th><th title="Goal Difference">GD</th><th title="Points">Pts</th></tr>`;
       teams.forEach((t, i) => {
         const owner = ALL_TEAMS.find(x => x.team === t.name)?.person;
         const p = owner ? PEOPLE.find(x => x.name === owner) : null;
@@ -690,7 +690,7 @@ function renderTeams() {
         h += `<tr class="${rowCls}">
           <td class="gs-pos-cell">${i+1}</td>
           <td><div class="gs-team-cell">${FLAGS[t.name]||''} <span class="gs-tname">${t.name}</span>${tag}</div></td>
-          <td>${t.p}</td><td>${gdStr}</td><td class="gs-pts">${t.pts}</td>
+          <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${gdStr}</td><td class="gs-pts">${t.pts}</td>
         </tr>`;
       });
       h += `</table></div>`;
