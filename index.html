@@ -164,6 +164,38 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
   .mode-toggle { width: 100%; }
   .mode-btn { flex: 1; text-align: center; }
 }
+/* Live Scores tab */
+.ls-section-title { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 16px 0 8px; display: flex; align-items: center; gap: 6px; }
+.ls-matches { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.ls-match { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.ls-match-live { border-color: #2d5a2d; background: #1a2e1a; }
+.ls-match-meta { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; background: rgba(0,0,0,.04); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text-muted); }
+.ls-match-live .ls-match-meta { background: rgba(0,0,0,.15); border-bottom-color: #2d5a2d; }
+.ls-live-label { display: flex; align-items: center; gap: 5px; color: #4ade80; font-weight: 600; font-size: 11px; }
+.ls-ft-label { color: var(--text-muted); }
+.ls-kick-label { color: var(--blue); font-weight: 500; }
+.ls-stage-label { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.ls-match-live .ls-stage-label { color: #86efac; }
+.ls-match-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 11px 12px; }
+.ls-team-col { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.ls-team-col-away { flex-direction: row-reverse; }
+.ls-flag { font-size: 18px; flex-shrink: 0; }
+.ls-tname { font-size: 13px; font-weight: 500; white-space: nowrap; }
+.ls-match-live .ls-tname { color: #f0f0ec; }
+.ls-winner .ls-tname { font-weight: 700; }
+.ls-loser .ls-tname { opacity: .55; }
+.ls-owner-tag { font-size: 11px; padding: 2px 7px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+.ls-score-col { text-align: center; min-width: 58px; flex-shrink: 0; }
+.ls-score { font-size: 20px; font-weight: 700; }
+.ls-score-live { color: #4ade80; animation: scorePulse .8s infinite; }
+.ls-vs { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.ls-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+@media(max-width:480px) {
+  .ls-match-row { grid-template-columns: 1fr auto 1fr; gap: 4px; padding: 10px 10px; }
+  .ls-tname { font-size: 12px; }
+  .ls-score { font-size: 18px; }
+  .ls-score-col { min-width: 48px; }
+}
 </style>
 </head>
 <body>
@@ -185,12 +217,14 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
   <div class="tabs">
     <button class="tab active" onclick="showTab('leaderboard',this)">Leaderboard</button>
+    <button class="tab" onclick="showTab('live',this)">Live Scores</button>
     <button class="tab" onclick="showTab('h2h',this)">Head to head</button>
     <button class="tab" onclick="showTab('teams',this)">All teams</button>
     <button class="tab" onclick="showTab('scoring',this)">Scoring</button>
   </div>
 
   <div id="tab-leaderboard"></div>
+  <div id="tab-live" style="display:none"></div>
   <div id="tab-h2h" style="display:none"></div>
   <div id="tab-teams" style="display:none"></div>
   <div id="tab-scoring" style="display:none"></div>
@@ -657,6 +691,124 @@ function renderScoring() {
   </div>`;
 }
 
+function renderLiveScores() {
+  const el = document.getElementById("tab-live");
+  if (!el) return;
+  if (!allMatches.length) {
+    el.innerHTML = `<div class="ls-empty">Loading matches…</div>`;
+    return;
+  }
+
+  const now = new Date();
+  const todayStr = now.toDateString();
+
+  const live = allMatches.filter(m => m.status === "IN_PLAY" || m.status === "PAUSED");
+  const finished = allMatches
+    .filter(m => m.status === "FINISHED")
+    .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+    .slice(0, 10);
+  const allUpcoming = allMatches
+    .filter(m => m.status === "SCHEDULED" || m.status === "TIMED")
+    .map(m => ({...m, _kickoff: new Date(m.utcDate)}))
+    .filter(m => m._kickoff > now)
+    .sort((a, b) => a._kickoff - b._kickoff);
+  const todayUpcoming = allUpcoming.filter(m => m._kickoff.toDateString() === todayStr);
+  const futureUpcoming = allUpcoming.filter(m => m._kickoff.toDateString() !== todayStr).slice(0, 8);
+
+  function stageLabel(stage) {
+    if (!stage) return '';
+    return stage.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function ownerTag(teamName) {
+    const entry = ALL_TEAMS.find(t => t.team === teamName);
+    if (!entry) return '';
+    const p = PEOPLE.find(x => x.name === entry.person);
+    if (!p) return '';
+    return `<span class="ls-owner-tag" style="background:${p.bg};color:${p.color}">${p.name}</span>`;
+  }
+
+  function matchCard(m) {
+    const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || '?');
+    const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || '?');
+    const isLive = m.status === "IN_PLAY" || m.status === "PAUSED";
+    const isFinished = m.status === "FINISHED";
+
+    const hs = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
+    const as2 = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
+    const min = m.minute ? m.minute + "'" : (m.status === "PAUSED" ? "HT" : "Live");
+
+    let homeClass = '', awayClass = '';
+    if (isFinished) {
+      if (hs > as2) { homeClass = 'ls-winner'; awayClass = 'ls-loser'; }
+      else if (as2 > hs) { awayClass = 'ls-winner'; homeClass = 'ls-loser'; }
+    }
+
+    let metaLeft, scoreHtml;
+    if (isLive) {
+      metaLeft = `<div class="ls-live-label"><div class="live-dot"></div>${min}</div>`;
+      scoreHtml = `<span class="ls-score ls-score-live">${hs} – ${as2}</span>`;
+    } else if (isFinished) {
+      const d = new Date(m.utcDate).toLocaleDateString([], {month:'short', day:'numeric'});
+      metaLeft = `<div class="ls-ft-label">FT · ${d}</div>`;
+      scoreHtml = `<span class="ls-score">${hs} – ${as2}</span>`;
+    } else {
+      const kickoff = m._kickoff || new Date(m.utcDate);
+      const isToday = kickoff.toDateString() === todayStr;
+      const timeStr = kickoff.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const dateStr = kickoff.toLocaleDateString([], {month:'short', day:'numeric'});
+      metaLeft = `<div class="ls-kick-label">${isToday ? timeStr : dateStr + ' · ' + timeStr}</div>`;
+      scoreHtml = `<span class="ls-vs">vs</span>`;
+    }
+
+    return `<div class="ls-match${isLive ? ' ls-match-live' : ''}">
+      <div class="ls-match-meta">
+        ${metaLeft}
+        <div class="ls-stage-label">${stageLabel(m.stage)}</div>
+      </div>
+      <div class="ls-match-row">
+        <div class="ls-team-col ${homeClass}">
+          <span class="ls-flag">${FLAGS[home]||''}</span>
+          <span class="ls-tname">${home}</span>
+          ${ownerTag(home)}
+        </div>
+        <div class="ls-score-col">${scoreHtml}</div>
+        <div class="ls-team-col ls-team-col-away ${awayClass}">
+          <span class="ls-flag">${FLAGS[away]||''}</span>
+          <span class="ls-tname">${away}</span>
+          ${ownerTag(away)}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  let h = '';
+
+  if (live.length > 0) {
+    h += `<div class="ls-section-title"><div class="live-dot"></div>Live Now</div>`;
+    h += `<div class="ls-matches">${live.map(matchCard).join('')}</div>`;
+  }
+
+  if (todayUpcoming.length > 0) {
+    h += `<div class="ls-section-title">Today's Matches</div>`;
+    h += `<div class="ls-matches">${todayUpcoming.map(matchCard).join('')}</div>`;
+  }
+
+  if (finished.length > 0) {
+    h += `<div class="ls-section-title">Recent Results</div>`;
+    h += `<div class="ls-matches">${finished.map(matchCard).join('')}</div>`;
+  }
+
+  if (futureUpcoming.length > 0) {
+    h += `<div class="ls-section-title">Upcoming</div>`;
+    h += `<div class="ls-matches">${futureUpcoming.map(matchCard).join('')}</div>`;
+  }
+
+  if (!h) h = `<div class="ls-empty">No matches available.</div>`;
+
+  el.innerHTML = h;
+}
+
 function renderLiveBanner(matches) {
   const el = document.getElementById("liveBanner");
   if (!el) return;
@@ -899,10 +1051,10 @@ function setH2H(side, val) {
 }
 window.setH2H = setH2H;
 
-function renderAll() { renderLeaderboard(); renderTeams(); renderScoring(); renderH2H(); }
+function renderAll() { renderLeaderboard(); renderTeams(); renderScoring(); renderH2H(); renderLiveScores(); }
 
 function showTab(name, btn) {
-  ["leaderboard","h2h","teams","scoring"].forEach(t => {
+  ["leaderboard","live","h2h","teams","scoring"].forEach(t => {
     document.getElementById("tab-"+t).style.display = t===name?"block":"none";
   });
   document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
