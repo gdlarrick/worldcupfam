@@ -876,7 +876,7 @@ function renderLiveBanner(matches) {
 
   // If there are live matches, refresh every 60 seconds instead of 5 min
   if (live.length > 0 && !window._liveInterval) {
-    window._liveInterval = setInterval(fetchScores, 60 * 1000);
+    window._liveInterval = setInterval(fetchScores, 20 * 1000);
   } else if (live.length === 0 && window._liveInterval) {
     clearInterval(window._liveInterval);
     window._liveInterval = null;
