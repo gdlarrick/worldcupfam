@@ -280,16 +280,28 @@ const ALL_TEAMS = [];
 DRAFT.forEach(d => d.teams.forEach(t => ALL_TEAMS.push({team:t, person:d.person})));
 
 const FLAGS = {
+  // Pool team names (canonical)
   "South Korea":"🇰🇷","Tunisia":"🇹🇳","Haiti":"🇭🇹","Norway":"🇳🇴",
   "Uzbekistan":"🇺🇿","Algeria":"🇩🇿","Colombia":"🇨🇴","Portugal":"🇵🇹",
   "Qatar":"🇶🇦","Senegal":"🇸🇳","Ecuador":"🇪🇨","Spain":"🇪🇸","Croatia":"🇭🇷",
   "Iraq":"🇮🇶","Ghana":"🇬🇭","Mexico":"🇲🇽","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Belgium":"🇧🇪",
   "Japan":"🇯🇵","South Africa":"🇿🇦","Argentina":"🇦🇷","Germany":"🇩🇪","Uruguay":"🇺🇾",
   "Iran":"🇮🇷","DR Congo":"🇨🇩","Canada":"🇨🇦","Switzerland":"🇨🇭","Paraguay":"🇵🇾",
-  "Jordan":"🇯🇴","Egypt":"🇪🇬","Brazil":"🇧🇷","Turkey":"🇹🇷","Bosnia and Herzegovina":"🇧🇦","Bosnia & Herzegovina":"🇧🇦","Bosnia-Herzegovina":"🇧🇦",
+  "Jordan":"🇯🇴","Egypt":"🇪🇬","Brazil":"🇧🇷","Turkey":"🇹🇷","Bosnia and Herzegovina":"🇧🇦",
   "Australia":"🇦🇺","Ivory Coast":"🇨🇮","United States":"🇺🇸","Netherlands":"🇳🇱","Czech Republic":"🇨🇿",
   "New Zealand":"🇳🇿","Morocco":"🇲🇦","Curacao":"🇨🇼","Sweden":"🇸🇪","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿",
   "Saudi Arabia":"🇸🇦","Cape Verde":"🇨🇻","Panama":"🇵🇦","France":"🇫🇷","Austria":"🇦🇹",
+  // API name variants (football-data.org alternate spellings)
+  "Korea Republic":"🇰🇷","Republic of Korea":"🇰🇷",
+  "Türkiye":"🇹🇷",
+  "IR Iran":"🇮🇷","Iran (Islamic Republic)":"🇮🇷",
+  "Côte d'Ivoire":"🇨🇮","Cote d'Ivoire":"🇨🇮",
+  "Curaçao":"🇨🇼",
+  "Czechia":"🇨🇿",
+  "Bosnia & Herzegovina":"🇧🇦","Bosnia-Herzegovina":"🇧🇦","Bosnia":"🇧🇦",
+  "USA":"🇺🇸","United States of America":"🇺🇸",
+  "Congo DR":"🇨🇩","Democratic Republic of Congo":"🇨🇩","Democratic Republic of the Congo":"🇨🇩",
+  "Cabo Verde":"🇨🇻",
 };
 
 const NAME_MAP = {
@@ -307,6 +319,11 @@ const NAME_MAP = {
   "United States of America":"United States",
 };
 function norm(n) { return NAME_MAP[n] || n; }
+function flag(name) {
+  const f = FLAGS[name];
+  if (!f) console.warn("[flag missing]", JSON.stringify(name));
+  return f || "";
+}
 
 const STATUSES = [
   {key:"group", label:"Group stage",  pts:0},
@@ -698,7 +715,7 @@ function renderTeams() {
         const rowCls = i < 2 ? 'gs-qualified' : (i === 2 ? 'gs-maybe' : '');
         h += `<tr class="${rowCls}">
           <td class="gs-pos-cell">${i+1}</td>
-          <td><div class="gs-team-cell">${FLAGS[t.name]||''} <span class="gs-tname">${t.name}</span>${tag}</div></td>
+          <td><div class="gs-team-cell">${flag(t.name)} <span class="gs-tname">${t.name}</span>${tag}</div></td>
           <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${gdStr}</td><td class="gs-pts">${t.pts}</td>
         </tr>`;
       });
@@ -848,13 +865,13 @@ function renderLiveScores() {
       </div>
       <div class="ls-match-row">
         <div class="ls-team-col ${homeClass}">
-          <span class="ls-flag">${FLAGS[home]||''}</span>
+          <span class="ls-flag">${flag(home)}</span>
           <span class="ls-tname">${home}</span>
           ${ownerTag(home)}
         </div>
         <div class="ls-score-col">${scoreHtml}</div>
         <div class="ls-team-col ls-team-col-away ${awayClass}">
-          <span class="ls-flag">${FLAGS[away]||''}</span>
+          <span class="ls-flag">${flag(away)}</span>
           <span class="ls-tname">${away}</span>
           ${ownerTag(away)}
         </div>
@@ -923,9 +940,9 @@ function renderLiveBanner(matches) {
       h += `<div class="live-match">
         <div class="live-dot"></div>
         <div class="live-teams">
-          ${FLAGS[home]||""} ${home} ${homeTag}
+          ${flag(home)} ${home} ${homeTag}
           <span class="live-score">${hs} – ${as2}</span>
-          ${FLAGS[away]||""} ${away} ${awayTag}
+          ${flag(away)} ${away} ${awayTag}
         </div>
         <div class="live-minute">${min}</div>
       </div>`;
@@ -948,7 +965,7 @@ function renderLiveBanner(matches) {
       const homeTag = homeOwner ? `<span class="live-pool-tag ${homeOwner==='Gretchen'?'live-yours':'live-family'}">${homeOwner}</span>` : "";
       const awayTag = awayOwner ? `<span class="live-pool-tag ${awayOwner==='Gretchen'?'live-yours':'live-family'}">${awayOwner}</span>` : "";
       h += `<div class="upcoming-match">
-        <div class="upcoming-teams">${FLAGS[home]||""} ${home} ${homeTag} vs ${FLAGS[away]||""} ${away} ${awayTag}</div>
+        <div class="upcoming-teams">${flag(home)} ${home} ${homeTag} vs ${flag(away)} ${away} ${awayTag}</div>
         <div class="upcoming-time">${kickoffStr}</div>
       </div>`;
     });
