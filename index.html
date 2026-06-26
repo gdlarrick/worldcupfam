@@ -486,7 +486,9 @@ function processMatches(matches) {
   // Mark group losers eliminated if knockouts started
   if (groupDone || knockoutTeams.size > 0) {
     ALL_TEAMS.forEach(t => {
-      if (!knockoutTeams.has(t.team) && !teamBest[t.team]) teamBest[t.team] = "elim";
+      if (!knockoutTeams.has(t.team) && (!teamBest[t.team] || teamBest[t.team] === "group")) {
+        teamBest[t.team] = "elim";
+      }
     });
   }
 
