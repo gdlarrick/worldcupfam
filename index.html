@@ -455,13 +455,15 @@ function processMatches(matches) {
     const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
     if (!home || !away) return;
     if (!groupData[grp]) groupData[grp] = {};
-    if (!groupData[grp][home]) groupData[grp][home] = {pts:0, p:0};
-    if (!groupData[grp][away]) groupData[grp][away] = {pts:0, p:0};
+    if (!groupData[grp][home]) groupData[grp][home] = {pts:0, p:0, gf:0, ga:0};
+    if (!groupData[grp][away]) groupData[grp][away] = {pts:0, p:0, gf:0, ga:0};
     if (m.status !== "FINISHED") return;
     const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
     const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
     if (hs == null || as2 == null) return;
     groupData[grp][home].p++; groupData[grp][away].p++;
+    groupData[grp][home].gf += hs; groupData[grp][home].ga += as2;
+    groupData[grp][away].gf += as2; groupData[grp][away].ga += hs;
     if (hs > as2) { groupData[grp][home].pts += 3; }
     else if (hs === as2) { groupData[grp][home].pts++; groupData[grp][away].pts++; }
     else { groupData[grp][away].pts += 3; }
@@ -536,10 +538,22 @@ function processMatches(matches) {
     });
   });
 
-  // Mark group losers eliminated if knockouts started
+  // Identify top-2 finishers in completed groups so they aren't wrongly eliminated
+  // (their R32 fixture slot may not yet have their name in the API)
+  const groupTopTwo = new Set();
+  Object.values(groupData).forEach(teams => {
+    const list = Object.entries(teams);
+    if (list.every(([, d]) => d.p >= 3)) {
+      list.sort((a, b) => (b[1].pts - a[1].pts) || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga) || b[1].gf - a[1].gf);
+      if (list[0]) groupTopTwo.add(list[0][0]);
+      if (list[1]) groupTopTwo.add(list[1][0]);
+    }
+  });
+
+  // Mark group losers eliminated if knockouts started, but protect top-2 finishers
   if (groupDone || knockoutTeams.size > 0) {
     ALL_TEAMS.forEach(t => {
-      if (!knockoutTeams.has(t.team) && (!teamBest[t.team] || teamBest[t.team] === "group")) {
+      if (!knockoutTeams.has(t.team) && !groupTopTwo.has(t.team) && (!teamBest[t.team] || teamBest[t.team] === "group")) {
         teamBest[t.team] = "elim";
       }
     });
