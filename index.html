@@ -437,6 +437,27 @@ function processMatches(matches) {
     }
   });
 
+  // Build per-group pts/played for mathematical elimination
+  const groupData = {};
+  groupMatches.forEach(m => {
+    const grp = m.group;
+    if (!grp) return;
+    const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+    const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+    if (!home || !away) return;
+    if (!groupData[grp]) groupData[grp] = {};
+    if (!groupData[grp][home]) groupData[grp][home] = {pts:0, p:0};
+    if (!groupData[grp][away]) groupData[grp][away] = {pts:0, p:0};
+    if (m.status !== "FINISHED") return;
+    const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
+    const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
+    if (hs == null || as2 == null) return;
+    groupData[grp][home].p++; groupData[grp][away].p++;
+    if (hs > as2) { groupData[grp][home].pts += 3; }
+    else if (hs === as2) { groupData[grp][home].pts++; groupData[grp][away].pts++; }
+    else { groupData[grp][away].pts += 3; }
+  });
+
   // Process knockout stages for advancement
   function promote(name, stageKey) {
     if (!name) return;
@@ -481,6 +502,19 @@ function processMatches(matches) {
       }
       if (m.stage === "FINAL" && winner) teamBest[winner] = "won";
     }
+  });
+
+  // Mathematically eliminated: can't possibly finish top 2 in group
+  Object.values(groupData).forEach(teams => {
+    const list = Object.entries(teams);
+    list.forEach(([name, data]) => {
+      if (knockoutTeams.has(name)) return;
+      const maxPts = data.pts + 3 * Math.max(0, 3 - data.p);
+      const beatsUs = list.filter(([n, d]) => n !== name && d.pts > maxPts).length;
+      if (beatsUs >= 2 && (!teamBest[name] || teamBest[name] === "group")) {
+        teamBest[name] = "elim";
+      }
+    });
   });
 
   // Mark group losers eliminated if knockouts started
