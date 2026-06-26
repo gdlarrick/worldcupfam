@@ -854,14 +854,20 @@ function processStandings(standings) {
       const name = norm(row.team?.name || row.team?.shortName || "");
       if (!name || !teamStatus[name]) return;
       const cur = teamStatus[name];
-      // Don't overwrite if already in a knockout stage
-      if (["r32","r16","qf","sf","final","won","elim"].includes(cur)) return;
+      // Don't overwrite actual knockout advancement — standings can't tell us more
+      if (["r32","r16","qf","sf","final","won"].includes(cur)) return;
+      // standings is the authoritative source for group-stage status,
+      // so we overwrite even if processMatches wrongly set "elim"
       const maxPts = row.points + 3 * Math.max(0, 3 - row.playedGames);
-      // Mathematically eliminated: 2+ teams already have more pts than our max
       const beatsUs = table.filter(r => r.team?.name !== row.team?.name && r.points > maxPts).length;
-      if (beatsUs >= 2) { teamStatus[name] = "elim"; return; }
-      // Group complete: 4th place is out; 3rd might still be best 3rd
-      if (allPlayed && row.position === 4) { teamStatus[name] = "elim"; }
+      if (beatsUs >= 2) {
+        teamStatus[name] = "elim";
+      } else if (allPlayed && row.position === 4) {
+        teamStatus[name] = "elim";
+      } else {
+        // Not definitively out — fix any wrong elim set by processMatches
+        teamStatus[name] = "group";
+      }
     });
   });
 }
