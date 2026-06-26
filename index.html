@@ -351,6 +351,7 @@ ALL_TEAMS.forEach(t => {
 
 let scoreMode = "last";
 let lastUpdated = null;
+let allStandings = [];
 let isLoading = false;
 let expandedRows = new Set();
 
@@ -366,13 +367,21 @@ async function fetchScores() {
   isLoading = true;
   setSyncState("loading", "Updating scores…");
   try {
-    const r = await fetch(`${PROXY}/?endpoint=competitions/WC/matches`);
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    const data = await r.json();
-    if (!data.matches) throw new Error("No matches in response");
-    allMatches = data.matches;
-    processMatches(data.matches);
-    renderLiveBanner(data.matches);
+    const [matchRes, standRes] = await Promise.all([
+      fetch(`${PROXY}/?endpoint=competitions/WC/matches`),
+      fetch(`${PROXY}/?endpoint=competitions/WC/standings`)
+    ]);
+    if (!matchRes.ok) throw new Error("HTTP " + matchRes.status);
+    const matchData = await matchRes.json();
+    if (!matchData.matches) throw new Error("No matches in response");
+    allMatches = matchData.matches;
+    if (standRes.ok) {
+      const standData = await standRes.json();
+      allStandings = standData.standings || [];
+    }
+    processMatches(allMatches);
+    processStandings(allStandings);
+    renderLiveBanner(allMatches);
     lastUpdated = new Date();
     setSyncState("ok", "Live · updated " + lastUpdated.toLocaleTimeString());
   } catch(e) {
@@ -465,6 +474,18 @@ function processMatches(matches) {
     if (STAGE_ORDER.indexOf(stageKey) > STAGE_ORDER.indexOf(cur)) teamBest[name] = stageKey;
   }
 
+  // First pass: populate knockoutTeams from ALL knockout fixtures (incl. scheduled)
+  // so teams that qualified but haven't played yet aren't wrongly eliminated
+  matches.forEach(m => {
+    const stageKey = API_STAGE_MAP[m.stage];
+    if (!stageKey || m.stage === "GROUP_STAGE") return;
+    const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+    const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+    if (home) knockoutTeams.add(home);
+    if (away) knockoutTeams.add(away);
+  });
+
+  // Second pass: process finished matches for stage promotion and elimination
   matches.forEach(m => {
     if (m.status !== "FINISHED") return;
     const stageKey = API_STAGE_MAP[m.stage];
@@ -478,8 +499,6 @@ function processMatches(matches) {
     } else {
       promote(home, stageKey);
       promote(away, stageKey);
-      knockoutTeams.add(home);
-      knockoutTeams.add(away);
 
       const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
       const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
@@ -823,6 +842,28 @@ function renderScoring() {
     </table>
     <p class="note" style="color:var(--amber)">Steve and AG picked 4 teams each. Everyone else picked 5. Scores update automatically — no manual entry needed!</p>
   </div>`;
+}
+
+function processStandings(standings) {
+  if (!standings || !standings.length) return;
+  standings.forEach(group => {
+    const table = group.table || [];
+    if (!table.length) return;
+    const allPlayed = table.every(row => row.playedGames >= 3);
+    table.forEach(row => {
+      const name = norm(row.team?.name || row.team?.shortName || "");
+      if (!name || !teamStatus[name]) return;
+      const cur = teamStatus[name];
+      // Don't overwrite if already in a knockout stage
+      if (["r32","r16","qf","sf","final","won","elim"].includes(cur)) return;
+      const maxPts = row.points + 3 * Math.max(0, 3 - row.playedGames);
+      // Mathematically eliminated: 2+ teams already have more pts than our max
+      const beatsUs = table.filter(r => r.team?.name !== row.team?.name && r.points > maxPts).length;
+      if (beatsUs >= 2) { teamStatus[name] = "elim"; return; }
+      // Group complete: 4th place is out; 3rd might still be best 3rd
+      if (allPlayed && row.position === 4) { teamStatus[name] = "elim"; }
+    });
+  });
 }
 
 function renderLiveScores() {
