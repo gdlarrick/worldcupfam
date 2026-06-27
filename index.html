@@ -525,8 +525,7 @@ function processMatches(matches) {
     }
   });
 
-  // Mathematically eliminated during group play: can't possibly finish top 3
-  // (threshold >= 3 means all other teams in the group beat your max — definitely last place)
+  // During group play: mathematically impossible to finish top 3 (guaranteed last place)
   Object.values(groupData).forEach(teams => {
     const list = Object.entries(teams);
     list.forEach(([name, data]) => {
@@ -539,16 +538,15 @@ function processMatches(matches) {
     });
   });
 
-  // In completed groups, 4th place is definitively eliminated (can't qualify even as best 3rd)
-  Object.values(groupData).forEach(teams => {
-    const list = Object.entries(teams);
-    if (!list.every(([, d]) => d.p >= 3)) return;
-    list.sort((a, b) => (b[1].pts - a[1].pts) || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga) || b[1].gf - a[1].gf);
-    const last = list[3];
-    if (last && !knockoutTeams.has(last[0]) && (!teamBest[last[0]] || teamBest[last[0]] === "group")) {
-      teamBest[last[0]] = "elim";
-    }
-  });
+  // Once all group matches are done AND knockout bracket is populated with real teams,
+  // any team not in a knockout fixture is eliminated (handles 3rd-place non-qualifiers too)
+  if (groupDone && knockoutTeams.size > 0) {
+    ALL_TEAMS.forEach(t => {
+      if (!knockoutTeams.has(t.team) && (!teamBest[t.team] || teamBest[t.team] === "group")) {
+        teamBest[t.team] = "elim";
+      }
+    });
+  }
 
   ALL_TEAMS.forEach(t => {
     if (teamBest[t.team]) teamStatus[t.team] = teamBest[t.team];
@@ -854,22 +852,13 @@ function processStandings(standings) {
     const table = group.table || [];
     if (!table.length) return;
     const allPlayed = table.every(row => row.playedGames >= 3);
+    if (!allPlayed) return;
     table.forEach(row => {
       const name = norm(row.team?.name || row.team?.shortName || "");
       if (!name || !teamStatus[name]) return;
       const cur = teamStatus[name];
       if (["r32","r16","qf","sf","final","won"].includes(cur)) return;
-      // Only eliminated if can't possibly finish 3rd (all 3 others beat max)
-      // or definitively last place in a completed group
-      const maxPts = row.points + 3 * Math.max(0, 3 - row.playedGames);
-      const beatsUs = table.filter(r => r.team?.name !== row.team?.name && r.points > maxPts).length;
-      if (beatsUs >= 3) {
-        teamStatus[name] = "elim";
-      } else if (allPlayed && row.position === 4) {
-        teamStatus[name] = "elim";
-      } else if (cur === "elim") {
-        teamStatus[name] = "group";
-      }
+      if (row.position === 4) teamStatus[name] = "elim";
     });
   });
 }
