@@ -134,6 +134,7 @@ header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .ts-danger { background: var(--coral-light); color: var(--coral); }
 .ts-out    { background: var(--gray-light); color: var(--gray); text-decoration: line-through; }
 .ts-ko     { background: var(--purple-light); color: var(--purple); }
+.ts-next-match { font-size: 11px; color: var(--text-muted); padding: 1px 0 4px 30px; }
 .expand-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 .info-banner { border-radius: var(--radius); padding: 12px 16px; font-size: 13px; margin-bottom: 16px; line-height: 1.6; border: 1px solid; }
 .info-banner.amber { background: var(--amber-light); border-color: #EF9F27; color: var(--amber); }
@@ -579,6 +580,17 @@ function getGroupStatus(team) {
   return {label: statusLabel, cls: statusCls};
 }
 
+function nextMatch(teamName) {
+  return allMatches
+    .filter(m => {
+      if (m.status !== "SCHEDULED" && m.status !== "TIMED") return false;
+      const hn = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+      const an = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+      return hn === teamName || an === teamName;
+    })
+    .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))[0] || null;
+}
+
 function sCls(s) {
   return {group:"s-group",elim:"s-elim",r32:"s-r32",r16:"s-r16",qf:"s-qf",sf:"s-sf",final:"s-final",won:"s-won"}[s]||"s-group";
 }
@@ -648,6 +660,23 @@ function renderTeamStatsPanel(myTeams) {
     if (gs) h += `<span class="ts-status ${gs.cls}">${gs.label}</span>`;
 
     h += `</div>`;
+
+    if (s !== "elim") {
+      const nm = nextMatch(t.team);
+      if (nm) {
+        const hn = norm(nm.homeTeam?.name || nm.homeTeam?.shortName || "");
+        const an = norm(nm.awayTeam?.name || nm.awayTeam?.shortName || "");
+        const opp = hn === t.team ? an : hn;
+        const oppFlag = FLAGS[opp] || "";
+        const kickoff = new Date(nm.utcDate);
+        const dateStr = kickoff.toLocaleDateString(undefined, {month:"short", day:"numeric"});
+        const timeStr = kickoff.toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"});
+        const stageStr = nm.stage !== "GROUP_STAGE"
+          ? ` · ${nm.stage.replace(/_/g," ").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}`
+          : "";
+        h += `<div class="ts-next-match">⚽ vs ${oppFlag} ${opp}${stageStr} · ${dateStr} ${timeStr}</div>`;
+      }
+    }
   });
   return h;
 }
