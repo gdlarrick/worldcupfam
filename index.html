@@ -525,19 +525,22 @@ function processMatches(matches) {
     }
   });
 
-  // Per-group 4th-place: mark last-place team in any completed group as eliminated immediately
+  // Mark teams eliminated when 2+ others in their group have more points than their max possible.
+  // This catches both 3rd and 4th place in completed groups (beatsUs=2 and 3 respectively).
+  // Teams already in a knockout fixture are skipped — they qualified regardless of group position.
   Object.values(groupData).forEach(teams => {
     const list = Object.entries(teams);
-    if (!list.every(([, d]) => d.p >= 3)) return;
-    list.sort((a, b) => (b[1].pts - a[1].pts) || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga) || b[1].gf - a[1].gf);
-    const last = list[3];
-    if (last && !knockoutTeams.has(last[0]) && (!teamBest[last[0]] || teamBest[last[0]] === "group")) {
-      teamBest[last[0]] = "elim";
-    }
+    list.forEach(([name, data]) => {
+      if (knockoutTeams.has(name)) return;
+      const maxPts = data.pts + 3 * Math.max(0, 3 - data.p);
+      const beatsUs = list.filter(([n, d]) => n !== name && d.pts > maxPts).length;
+      if (beatsUs >= 2 && (!teamBest[name] || teamBest[name] === "group")) {
+        teamBest[name] = "elim";
+      }
+    });
   });
 
-  // Once all group matches are done AND knockout bracket has real teams,
-  // any group-stage team not in a knockout fixture is eliminated (catches 3rd-place non-qualifiers)
+  // Final sweep: once all groups done and R32 populated, catch any remaining non-qualifiers
   if (groupDone && knockoutTeams.size > 0) {
     ALL_TEAMS.forEach(t => {
       if (!knockoutTeams.has(t.team) && (!teamBest[t.team] || teamBest[t.team] === "group")) {
@@ -856,7 +859,8 @@ function processStandings(standings) {
       if (!name || !teamStatus[name]) return;
       const cur = teamStatus[name];
       if (["r32","r16","qf","sf","final","won"].includes(cur)) return;
-      if (row.position === 4) teamStatus[name] = "elim";
+      // position 3 and 4 are eliminated (3rd-place qualifiers will be corrected via knockoutTeams)
+      if (row.position >= 3) teamStatus[name] = "elim";
     });
   });
 }
