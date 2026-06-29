@@ -476,15 +476,15 @@ function processMatches(matches) {
     if (STAGE_ORDER.indexOf(stageKey) > STAGE_ORDER.indexOf(cur)) teamBest[name] = stageKey;
   }
 
-  // First pass: populate knockoutTeams from ALL knockout fixtures (incl. scheduled)
-  // so teams that qualified but haven't played yet aren't wrongly eliminated
+  // First pass: scan ALL knockout fixtures (incl. scheduled) — add to knockoutTeams
+  // and promote stage so teams in upcoming R32 matches show as "Advanced" not "group"
   matches.forEach(m => {
     const stageKey = API_STAGE_MAP[m.stage];
     if (!stageKey || m.stage === "GROUP_STAGE") return;
     const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
     const away = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
-    if (home) knockoutTeams.add(home);
-    if (away) knockoutTeams.add(away);
+    if (home) { knockoutTeams.add(home); promote(home, stageKey); }
+    if (away) { knockoutTeams.add(away); promote(away, stageKey); }
   });
 
   // Second pass: process finished matches for stage promotion and elimination
