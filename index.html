@@ -313,6 +313,9 @@ const NAME_MAP = {
   "Bosnia & Herzegovina":"Bosnia and Herzegovina",
   "Bosnia-Herzegovina":"Bosnia and Herzegovina",
   "Bosnia":"Bosnia and Herzegovina",
+  "Bosnia and Hercegovina":"Bosnia and Herzegovina",
+  "Bosnia & Hercegovina":"Bosnia and Herzegovina",
+  "BIH":"Bosnia and Herzegovina",
   "Türkiye":"Turkey","Turkey":"Turkey",
   "IR Iran":"Iran","Iran (Islamic Republic)":"Iran",
   "Cabo Verde":"Cape Verde",
@@ -889,8 +892,8 @@ function processStandings(standings) {
       if (!name || !teamStatus[name]) return;
       const cur = teamStatus[name];
       if (["r32","r16","qf","sf","final","won"].includes(cur)) return;
-      // position 3 and 4 are eliminated (3rd-place qualifiers will be corrected via knockoutTeams)
-      if (row.position >= 3) teamStatus[name] = "elim";
+      // only position 4 is definitively eliminated — 3rd place may qualify as best 3rd in 2026
+      if (row.position === 4) teamStatus[name] = "elim";
     });
   });
 }
