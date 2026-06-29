@@ -514,11 +514,20 @@ function processMatches(matches) {
         if (hs > as2) { winner = home; loser = away; }
         else if (as2 > hs) { winner = away; loser = home; }
         else {
-          const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
-          const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
-          if (hp != null && ap != null) {
-            winner = hp > ap ? home : away;
-            loser = hp > ap ? away : home;
+          // regular time draw — check extra time, then penalties
+          const he = m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam;
+          const ae = m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam;
+          if (he != null && ae != null && he !== as2) {
+            if (he > ae) { winner = home; loser = away; }
+            else if (ae > he) { winner = away; loser = home; }
+          }
+          if (!winner) {
+            const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+            const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+            if (hp != null && ap != null) {
+              winner = hp > ap ? home : away;
+              loser = hp > ap ? away : home;
+            }
           }
         }
       }
