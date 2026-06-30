@@ -756,6 +756,36 @@ function renderLeaderboard() {
     </div>`;
   });
   h += `</div>`;
+
+  // Temporary debug panel — shows R32+ matches for any team not yet eliminated
+  const debugTeams = ["Germany","Bosnia and Herzegovina","South Africa","Uruguay"];
+  let dbg = `<div style="margin-top:20px;padding:12px;background:var(--card);border-radius:10px;font-size:11px;font-family:monospace;color:var(--text-muted)">
+    <div style="font-weight:600;color:var(--text);margin-bottom:8px">🔧 Debug — knockout match data</div>`;
+  debugTeams.forEach(team => {
+    const ms = allMatches.filter(m => {
+      if (m.stage === "GROUP_STAGE") return false;
+      const hn = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+      const an = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+      return hn === team || an === team;
+    });
+    dbg += `<div style="margin-bottom:6px"><strong>${team}</strong> status=${teamStatus[team]||"?"}</div>`;
+    if (!ms.length) { dbg += `<div style="margin-bottom:8px;color:#888">no knockout matches found</div>`; }
+    ms.forEach(m => {
+      const hn = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
+      const an = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
+      dbg += `<div style="margin-bottom:8px;padding:6px;background:var(--bg);border-radius:6px">
+        ${m.stage} · ${m.status}<br>
+        ${hn} vs ${an}<br>
+        winner=${m.score?.winner||"null"} dur=${m.score?.duration||"null"}<br>
+        FT=${m.score?.fullTime?.home??'?'}-${m.score?.fullTime?.away??'?'}
+        ET=${m.score?.extraTime?.home??'null'}-${m.score?.extraTime?.away??'null'}
+        PEN=${m.score?.penalties?.home??'null'}-${m.score?.penalties?.away??'null'}
+      </div>`;
+    });
+  });
+  dbg += `</div>`;
+  h += dbg;
+
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
 
