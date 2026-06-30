@@ -509,20 +509,19 @@ function processMatches(matches) {
 
       let loser = null, winner = null;
       const duration = m.score?.duration; // "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT"
-      // Use the most complete score available: penalties > extra time > full time
-      if (duration === "PENALTY_SHOOTOUT") {
-        const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
-        const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
-        if (hp != null && ap != null) {
-          winner = hp > ap ? home : away;
-          loser  = hp > ap ? away : home;
-        }
+      // Penalties: explicit penalty scores (also fallback if duration missing but penalties exist)
+      const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+      const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+      if (hp != null && ap != null && hp !== ap) {
+        winner = hp > ap ? home : away;
+        loser  = hp > ap ? away : home;
       } else {
-        // Use extra time score if available (cumulative total after 120 min), else full time
-        const hs = m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam
-                ?? m.score?.fullTime?.home  ?? m.score?.fullTime?.homeTeam;
-        const as2 = m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam
-                 ?? m.score?.fullTime?.away  ?? m.score?.fullTime?.awayTeam;
+        // Extra time: only read if duration says so (avoid zeroed-out ET fields on regular matches)
+        const useET = duration === "EXTRA_TIME" || duration === "PENALTY_SHOOTOUT";
+        const hs = (useET ? (m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam) : null)
+                ?? m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
+        const as2 = (useET ? (m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam) : null)
+                 ?? m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
         if (hs != null && as2 != null) {
           if (hs > as2) { winner = home; loser = away; }
           else if (as2 > hs) { winner = away; loser = home; }
