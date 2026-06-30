@@ -343,8 +343,12 @@ const STATUSES = [
 const STAGE_ORDER = ["group","elim","r32","r16","qf","sf","final","won"];
 const POINTS = Object.fromEntries(STATUSES.map(s=>[s.key,s.pts]));
 const API_STAGE_MAP = {
-  "GROUP_STAGE":"group","ROUND_OF_32":"r32","ROUND_OF_16":"r16",
-  "QUARTER_FINALS":"qf","SEMI_FINALS":"sf","FINAL":"final",
+  "GROUP_STAGE":"group",
+  "ROUND_OF_32":"r32","LAST_32":"r32",
+  "ROUND_OF_16":"r16","LAST_16":"r16",
+  "QUARTER_FINALS":"qf","LAST_8":"qf",
+  "SEMI_FINALS":"sf","LAST_4":"sf",
+  "FINAL":"final","LAST_2":"final",
 };
 
 let teamStatus = {};
@@ -521,15 +525,21 @@ function processMatches(matches) {
           winner = hp > ap ? home : away;
           loser  = hp > ap ? away : home;
         } else {
-          const dur = m.score?.duration;
-          const useET = dur === "EXTRA_TIME" || dur === "PENALTY_SHOOTOUT";
-          const hs = (useET ? (m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam) : null)
-                  ?? m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
-          const as2 = (useET ? (m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam) : null)
-                   ?? m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
-          if (hs != null && as2 != null) {
-            if (hs > as2) { winner = home; loser = away; }
-            else if (as2 > hs) { winner = away; loser = home; }
+          // For PENALTY_SHOOTOUT where PEN scores are equal or null, the API encodes the
+          // actual penalty tally in fullTime (e.g. FT=5-6 means home scored 5, away 6).
+          // Try fullTime first, then extraTime as a final fallback.
+          const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
+          const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
+          if (hs != null && as2 != null && hs !== as2) {
+            winner = hs > as2 ? home : away;
+            loser  = hs > as2 ? away : home;
+          } else {
+            const he = m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam;
+            const ae = m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam;
+            if (he != null && ae != null && he !== ae) {
+              winner = he > ae ? home : away;
+              loser  = he > ae ? away : home;
+            }
           }
         }
       }
@@ -537,7 +547,7 @@ function processMatches(matches) {
         const cur = teamBest[loser] || "group";
         if (STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
       }
-      if (m.stage === "FINAL" && winner) teamBest[winner] = "won";
+      if (stageKey === "final" && winner) teamBest[winner] = "won";
     }
   });
 
@@ -756,35 +766,6 @@ function renderLeaderboard() {
     </div>`;
   });
   h += `</div>`;
-
-  // Temporary debug panel — shows R32+ matches for any team not yet eliminated
-  const debugTeams = ["Germany","Bosnia and Herzegovina","South Africa","Uruguay"];
-  let dbg = `<div style="margin-top:20px;padding:12px;background:var(--card);border-radius:10px;font-size:11px;font-family:monospace;color:var(--text-muted)">
-    <div style="font-weight:600;color:var(--text);margin-bottom:8px">🔧 Debug — knockout match data</div>`;
-  debugTeams.forEach(team => {
-    const ms = allMatches.filter(m => {
-      if (m.stage === "GROUP_STAGE") return false;
-      const hn = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
-      const an = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
-      return hn === team || an === team;
-    });
-    dbg += `<div style="margin-bottom:6px"><strong>${team}</strong> status=${teamStatus[team]||"?"}</div>`;
-    if (!ms.length) { dbg += `<div style="margin-bottom:8px;color:#888">no knockout matches found</div>`; }
-    ms.forEach(m => {
-      const hn = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
-      const an = norm(m.awayTeam?.name || m.awayTeam?.shortName || "");
-      dbg += `<div style="margin-bottom:8px;padding:6px;background:var(--bg);border-radius:6px">
-        ${m.stage} · ${m.status}<br>
-        ${hn} vs ${an}<br>
-        winner=${m.score?.winner||"null"} dur=${m.score?.duration||"null"}<br>
-        FT=${m.score?.fullTime?.home??'?'}-${m.score?.fullTime?.away??'?'}
-        ET=${m.score?.extraTime?.home??'null'}-${m.score?.extraTime?.away??'null'}
-        PEN=${m.score?.penalties?.home??'null'}-${m.score?.penalties?.away??'null'}
-      </div>`;
-    });
-  });
-  dbg += `</div>`;
-  h += dbg;
 
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
