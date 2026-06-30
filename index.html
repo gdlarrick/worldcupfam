@@ -492,9 +492,10 @@ function processMatches(matches) {
     if (away) { knockoutTeams.add(away); promote(away, stageKey); }
   });
 
-  // Second pass: process finished matches for stage promotion and elimination
+  // Second pass: process completed matches for stage promotion and elimination
+  const DONE_STATUSES = new Set(["FINISHED","AWARDED","WALKOVER"]);
   matches.forEach(m => {
-    if (m.status !== "FINISHED") return;
+    if (!DONE_STATUSES.has(m.status)) return;
     const stageKey = API_STAGE_MAP[m.stage];
     if (!stageKey) return;
     const home = norm(m.homeTeam?.name || m.homeTeam?.shortName || "");
@@ -508,23 +509,28 @@ function processMatches(matches) {
       promote(away, stageKey);
 
       let loser = null, winner = null;
-      const duration = m.score?.duration; // "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT"
-      // Penalties: explicit penalty scores (also fallback if duration missing but penalties exist)
-      const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
-      const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
-      if (hp != null && ap != null && hp !== ap) {
-        winner = hp > ap ? home : away;
-        loser  = hp > ap ? away : home;
-      } else {
-        // Extra time: only read if duration says so (avoid zeroed-out ET fields on regular matches)
-        const useET = duration === "EXTRA_TIME" || duration === "PENALTY_SHOOTOUT";
-        const hs = (useET ? (m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam) : null)
-                ?? m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
-        const as2 = (useET ? (m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam) : null)
-                 ?? m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
-        if (hs != null && as2 != null) {
-          if (hs > as2) { winner = home; loser = away; }
-          else if (as2 > hs) { winner = away; loser = home; }
+      // score.winner is the most reliable field — set by the API for all completion types
+      const sw = m.score?.winner;
+      if (sw === "HOME_TEAM") { winner = home; loser = away; }
+      else if (sw === "AWAY_TEAM") { winner = away; loser = home; }
+      else {
+        // Fallback: parse scores — penalties first, then ET (if duration says so), then full time
+        const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+        const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+        if (hp != null && ap != null && hp !== ap) {
+          winner = hp > ap ? home : away;
+          loser  = hp > ap ? away : home;
+        } else {
+          const dur = m.score?.duration;
+          const useET = dur === "EXTRA_TIME" || dur === "PENALTY_SHOOTOUT";
+          const hs = (useET ? (m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam) : null)
+                  ?? m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
+          const as2 = (useET ? (m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam) : null)
+                   ?? m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
+          if (hs != null && as2 != null) {
+            if (hs > as2) { winner = home; loser = away; }
+            else if (as2 > hs) { winner = away; loser = home; }
+          }
         }
       }
       if (loser) {
