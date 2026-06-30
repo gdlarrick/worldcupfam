@@ -507,28 +507,25 @@ function processMatches(matches) {
       promote(home, stageKey);
       promote(away, stageKey);
 
-      const hs = m.score?.fullTime?.home ?? m.score?.fullTime?.homeTeam;
-      const as2 = m.score?.fullTime?.away ?? m.score?.fullTime?.awayTeam;
       let loser = null, winner = null;
-      if (hs != null && as2 != null) {
-        if (hs > as2) { winner = home; loser = away; }
-        else if (as2 > hs) { winner = away; loser = home; }
-        else {
-          // regular time draw — check extra time, then penalties
-          const he = m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam;
-          const ae = m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam;
-          if (he != null && ae != null && he !== as2) {
-            if (he > ae) { winner = home; loser = away; }
-            else if (ae > he) { winner = away; loser = home; }
-          }
-          if (!winner) {
-            const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
-            const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
-            if (hp != null && ap != null) {
-              winner = hp > ap ? home : away;
-              loser = hp > ap ? away : home;
-            }
-          }
+      const duration = m.score?.duration; // "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT"
+      // Use the most complete score available: penalties > extra time > full time
+      if (duration === "PENALTY_SHOOTOUT") {
+        const hp = m.score?.penalties?.home ?? m.score?.penalties?.homeTeam;
+        const ap = m.score?.penalties?.away ?? m.score?.penalties?.awayTeam;
+        if (hp != null && ap != null) {
+          winner = hp > ap ? home : away;
+          loser  = hp > ap ? away : home;
+        }
+      } else {
+        // Use extra time score if available (cumulative total after 120 min), else full time
+        const hs = m.score?.extraTime?.home ?? m.score?.extraTime?.homeTeam
+                ?? m.score?.fullTime?.home  ?? m.score?.fullTime?.homeTeam;
+        const as2 = m.score?.extraTime?.away ?? m.score?.extraTime?.awayTeam
+                 ?? m.score?.fullTime?.away  ?? m.score?.fullTime?.awayTeam;
+        if (hs != null && as2 != null) {
+          if (hs > as2) { winner = home; loser = away; }
+          else if (as2 > hs) { winner = away; loser = home; }
         }
       }
       if (loser) {
