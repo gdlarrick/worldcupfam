@@ -904,6 +904,10 @@ function renderScoring() {
 
 function processStandings(standings) {
   if (!standings || !standings.length) return;
+
+  // Collect all third-place teams for best-8 logic
+  const thirdPlace = [];
+
   standings.forEach(group => {
     const table = group.table || [];
     if (!table.length) return;
@@ -913,11 +917,27 @@ function processStandings(standings) {
       const name = norm(row.team?.name || row.team?.shortName || "");
       if (!name || !teamStatus[name]) return;
       const cur = teamStatus[name];
-      if (["r32","r16","qf","sf","final","won"].includes(cur)) return;
-      // only position 4 is definitively eliminated — 3rd place may qualify as best 3rd in 2026
-      if (row.position === 4) teamStatus[name] = "elim";
+      const alreadyThrough = ["r32","r16","qf","sf","final","won"].includes(cur);
+      if (row.position === 1 || row.position === 2) {
+        // Top 2 in a completed group always advance
+        if (!alreadyThrough) teamStatus[name] = "r32";
+      } else if (row.position === 3) {
+        thirdPlace.push({name, pts: row.points, gd: row.goalDifference, gf: row.goalsFor, cur});
+      } else if (row.position === 4) {
+        if (!alreadyThrough) teamStatus[name] = "elim";
+      }
     });
   });
+
+  // Best 8 of 12 third-place teams advance in the 2026 format
+  if (thirdPlace.length === 12) {
+    thirdPlace.sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf);
+    thirdPlace.forEach((t, i) => {
+      const alreadyThrough = ["r32","r16","qf","sf","final","won"].includes(t.cur);
+      if (i < 8) { if (!alreadyThrough) teamStatus[t.name] = "r32"; }
+      else        { if (!alreadyThrough) teamStatus[t.name] = "elim"; }
+    });
+  }
 }
 
 function renderLiveScores() {
