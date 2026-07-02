@@ -767,13 +767,6 @@ function renderLeaderboard() {
   });
   h += `</div>`;
 
-  // Temp debug: show status for key teams
-  const dbgTeams = ["England","DR Congo","Ecuador","Bosnia and Herzegovina","Germany","South Africa"];
-  h += `<div style="margin-top:16px;padding:10px;background:var(--card);border-radius:8px;font-size:11px;font-family:monospace;color:var(--text-muted)">`;
-  h += `<strong style="color:var(--text)">Status check:</strong> `;
-  h += dbgTeams.map(t => `${t}=${teamStatus[t]||'?'}`).join(' · ');
-  h += `</div>`;
-
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
 
@@ -926,8 +919,10 @@ function processStandings(standings) {
       const cur = teamStatus[name];
       const alreadyThrough = ["r32","r16","qf","sf","final","won"].includes(cur);
       if (row.position === 1 || row.position === 2) {
-        // Top 2 in a completed group always advance
-        if (!alreadyThrough) teamStatus[name] = "r32";
+        // Top 2 in a completed group advance — but only upgrade from "group":
+        // if a team is already "elim" here they were knocked out of the R32,
+        // not wrongly swept, so don't override their result.
+        if (cur === "group") teamStatus[name] = "r32";
       } else if (row.position === 3) {
         thirdPlace.push({name, pts: row.points, gd: row.goalDifference, gf: row.goalsFor, cur});
       } else if (row.position === 4) {
@@ -940,9 +935,8 @@ function processStandings(standings) {
   if (thirdPlace.length === 12) {
     thirdPlace.sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf);
     thirdPlace.forEach((t, i) => {
-      const alreadyThrough = ["r32","r16","qf","sf","final","won"].includes(t.cur);
-      if (i < 8) { if (!alreadyThrough) teamStatus[t.name] = "r32"; }
-      else        { if (!alreadyThrough) teamStatus[t.name] = "elim"; }
+      if (i < 8) { if (t.cur === "group") teamStatus[t.name] = "r32"; }
+      else        { if (t.cur === "group") teamStatus[t.name] = "elim"; }
     });
   }
 }
