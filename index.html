@@ -774,6 +774,15 @@ function renderLeaderboard() {
   });
   h += `</div>`;
 
+  const _dbg = ["Portugal","Spain","England","Morocco"];
+  h += `<div style="margin-top:12px;padding:8px 12px;background:var(--card);border-radius:8px;font-size:11px;font-family:monospace;color:var(--text-muted)">`;
+  h += _dbg.map(t=>`${t}=${teamStatus[t]||'?'}`).join(' · ');
+  // also dump finished knockout matches
+  const _ko = allMatches.filter(m=>m.stage!=="GROUP_STAGE"&&m.status==="FINISHED");
+  h += `<br>finished KO matches: ${_ko.length} — `;
+  h += _ko.map(m=>`${m.stage}:${m.homeTeam?.name||'?'} vs ${m.awayTeam?.name||'?'} w=${m.score?.winner||'null'}`).join(' | ');
+  h += `</div>`;
+
   document.getElementById("tab-leaderboard").innerHTML = h;
 }
 
