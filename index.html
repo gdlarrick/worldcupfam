@@ -547,7 +547,12 @@ function processMatches(matches) {
         const cur = teamBest[loser] || "group";
         if (STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
       }
-      if (stageKey === "final" && winner) teamBest[winner] = "won";
+      if (winner) {
+        // Promote winner to the next stage immediately — don't wait for next-round fixture
+        const nextStage = {r32:"r16", r16:"qf", qf:"sf", sf:"final"}[stageKey];
+        if (nextStage) promote(winner, nextStage);
+        else if (stageKey === "final") teamBest[winner] = "won";
+      }
     }
   });
 
