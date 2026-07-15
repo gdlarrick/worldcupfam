@@ -349,6 +349,7 @@ const API_STAGE_MAP = {
   "QUARTER_FINALS":"qf","LAST_8":"qf",
   "SEMI_FINALS":"sf","LAST_4":"sf",
   "FINAL":"final","LAST_2":"final",
+  "PLAY_OFF_3_4":"sf","THIRD_PLACE":"sf","PLACE_3_4":"sf",
 };
 
 let teamStatus = {};
@@ -545,7 +546,16 @@ function processMatches(matches) {
       }
       if (loser) {
         const cur = teamBest[loser] || "group";
-        if (STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
+        // Don't eliminate if the loser still has another match to play (e.g. 3rd-place game)
+        const stillHasMatch = matches.some(other =>
+          other !== m &&
+          other.stage !== "GROUP_STAGE" &&
+          API_STAGE_MAP[other.stage] &&
+          ["SCHEDULED","TIMED","IN_PLAY","PAUSED"].includes(other.status) &&
+          (norm(other.homeTeam?.name || other.homeTeam?.shortName || "") === loser ||
+           norm(other.awayTeam?.name  || other.awayTeam?.shortName  || "") === loser)
+        );
+        if (!stillHasMatch && STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
       }
       if (winner) {
         // Promote winner to the next stage immediately — don't wait for next-round fixture
