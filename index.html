@@ -550,7 +550,6 @@ function processMatches(matches) {
         const stillHasMatch = matches.some(other =>
           other !== m &&
           other.stage !== "GROUP_STAGE" &&
-          API_STAGE_MAP[other.stage] &&
           ["SCHEDULED","TIMED","IN_PLAY","PAUSED"].includes(other.status) &&
           (norm(other.homeTeam?.name || other.homeTeam?.shortName || "") === loser ||
            norm(other.awayTeam?.name  || other.awayTeam?.shortName  || "") === loser)
