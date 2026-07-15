@@ -547,14 +547,16 @@ function processMatches(matches) {
       if (loser) {
         const cur = teamBest[loser] || "group";
         // Don't eliminate if the loser still has another match to play (e.g. 3rd-place game)
-        const stillHasMatch = matches.some(other =>
+        // SF losers always play the 3rd-place match — never eliminate them here
+        const isSFLoss = stageKey === "sf";
+        const stillHasMatch = !isSFLoss && matches.some(other =>
           other !== m &&
           other.stage !== "GROUP_STAGE" &&
           ["SCHEDULED","TIMED","IN_PLAY","PAUSED"].includes(other.status) &&
           (norm(other.homeTeam?.name || other.homeTeam?.shortName || "") === loser ||
            norm(other.awayTeam?.name  || other.awayTeam?.shortName  || "") === loser)
         );
-        if (!stillHasMatch && STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
+        if (!isSFLoss && !stillHasMatch && STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
       }
       if (winner) {
         // Promote winner to the next stage immediately — don't wait for next-round fixture
