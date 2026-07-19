@@ -546,23 +546,24 @@ function processMatches(matches) {
       }
       if (loser) {
         const cur = teamBest[loser] || "group";
-        // Don't eliminate if the loser still has another match to play (e.g. 3rd-place game)
-        // SF losers always play the 3rd-place match — never eliminate them here
-        const isSFLoss = stageKey === "sf";
-        const stillHasMatch = !isSFLoss && matches.some(other =>
-          other !== m &&
-          other.stage !== "GROUP_STAGE" &&
-          ["SCHEDULED","TIMED","IN_PLAY","PAUSED"].includes(other.status) &&
-          (norm(other.homeTeam?.name || other.homeTeam?.shortName || "") === loser ||
-           norm(other.awayTeam?.name  || other.awayTeam?.shortName  || "") === loser)
-        );
-        if (!isSFLoss && !stillHasMatch && STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) teamBest[loser] = "elim";
+        // Semi-final losers always play the 3rd-place match — don't eliminate them
+        const SF_RAW = new Set(["LAST_4","SEMI_FINALS"]);
+        const isSFLoss = SF_RAW.has(m.stage);
+        // Final losers are runners-up — keep them at "final" stage, not eliminated
+        const FINAL_RAW = new Set(["FINAL","LAST_2"]);
+        const isFinalLoss = FINAL_RAW.has(m.stage);
+        if (!isSFLoss && !isFinalLoss && STAGE_ORDER.indexOf(cur) <= STAGE_ORDER.indexOf(stageKey)) {
+          teamBest[loser] = "elim";
+        }
       }
       if (winner) {
-        // Promote winner to the next stage immediately — don't wait for next-round fixture
-        const nextStage = {r32:"r16", r16:"qf", qf:"sf", sf:"final"}[stageKey];
-        if (nextStage) promote(winner, nextStage);
-        else if (stageKey === "final") teamBest[winner] = "won";
+        // Promote winner to the next stage — but 3rd-place match winner stays at "sf" (not "final")
+        const THIRD_PLACE_RAW = new Set(["PLAY_OFF_3_4","THIRD_PLACE","PLACE_3_4"]);
+        if (!THIRD_PLACE_RAW.has(m.stage)) {
+          const nextStage = {r32:"r16", r16:"qf", qf:"sf", sf:"final"}[stageKey];
+          if (nextStage) promote(winner, nextStage);
+          else if (stageKey === "final") teamBest[winner] = "won";
+        }
       }
     }
   });
